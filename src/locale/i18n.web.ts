@@ -76,6 +76,10 @@ export async function dynamicActivate(locale: AppLanguage) {
       mod = await import(`./locales/ko/messages`)
       break
     }
+    case AppLanguage.lv: {
+      mod = await import(`./locales/lv/messages`)
+      break
+    }
     case AppLanguage.nl: {
       mod = await import(`./locales/nl/messages`)
       break
@@ -121,7 +125,8 @@ export async function dynamicActivate(locale: AppLanguage) {
       break
     }
     default: {
-      mod = await import(`./locales/en/messages`)
+      mod = await import(`./locales/lv/messages`)
+      // TODO: Set this back 'en' when it changing back to english is fixed (so that it doesn't).
       break
     }
   }
