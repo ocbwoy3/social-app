@@ -9,6 +9,7 @@ import {
 import {type AppBskyActorDefs} from '@atproto/api'
 
 import {logger} from '#/logger'
+import {listenOpenNuxDialog} from '#/state/events'
 import {STALE} from '#/state/queries'
 import {Nux, useNuxs, useResetNuxs, useSaveNux} from '#/state/queries/nuxs'
 import {
@@ -18,6 +19,10 @@ import {
 import {useProfileQuery} from '#/state/queries/profile'
 import {type SessionAccount, useSession} from '#/state/session'
 import {useOnboardingState} from '#/state/shell'
+import {ActivitySubscriptionsNUX} from '#/components/dialogs/nuxs/ActivitySubscriptions'
+import {BookmarksAnnouncement} from '#/components/dialogs/nuxs/BookmarksAnnouncement'
+import {FindContactsAnnouncement} from '#/components/dialogs/nuxs/FindContactsAnnouncement'
+import {InitialVerificationAnnouncement} from '#/components/dialogs/nuxs/InitialVerificationAnnouncement'
 import {
   enabled as isLiveNowBetaDialogEnabled,
   LiveNowBetaDialog,
@@ -118,6 +123,13 @@ function Inner({
   }
 
   useEffect(() => {
+    return listenOpenNuxDialog(id => {
+      setActiveNux(id)
+      unsnooze()
+    })
+  }, [])
+
+  useEffect(() => {
     if (snoozed) return // comment this out to test
     if (!nuxs) return
 
@@ -186,6 +198,14 @@ function Inner({
   return (
     <Context.Provider value={ctx}>
       {/*For example, activeNux === Nux.NeueTypography && <NeueTypography />*/}
+      {activeNux === Nux.InitialVerificationAnnouncement && (
+        <InitialVerificationAnnouncement />
+      )}
+      {activeNux === Nux.FindContactsAnnouncement && (
+        <FindContactsAnnouncement />
+      )}
+      {activeNux === Nux.BookmarksAnnouncement && <BookmarksAnnouncement />}
+      {activeNux === Nux.ActivitySubscriptions && <ActivitySubscriptionsNUX />}
       {activeNux === Nux.LiveNowBetaDialog && <LiveNowBetaDialog />}
     </Context.Provider>
   )

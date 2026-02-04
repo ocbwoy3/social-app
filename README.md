@@ -13,7 +13,9 @@ TODO:
 - [x] "Alter Ego" feature (client-side custom profile details)
 - [x] Statsig gates editor
       (`~/Developer/BlueskyOnCrack/src/lib/statsig/gates.ts`)
-- [ ] Ability to turn off AppLabelers
+- [x] Ability to turn off AppLabelers
+- [ ] Cancellations & Trusted Cancellers (opposite of verification)
+- [ ] Remove the New York Times
 - [ ] Add niche features
 - [ ] Add ability to edit posts
 - [ ] Restore backdated posts

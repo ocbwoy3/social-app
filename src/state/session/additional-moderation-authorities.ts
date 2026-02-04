@@ -1,6 +1,7 @@
 import {BskyAgent} from '@atproto/api'
 
 import {logger} from '#/logger'
+import * as persisted from '#/state/persisted'
 import {device} from '#/storage'
 
 export const BR_LABELER = 'did:plc:ekitcvx7uwnauoqy5oest3hm' // Brazil
@@ -86,7 +87,12 @@ export function configureAdditionalModerationAuthorities() {
   }
 
   const appLabelers = Array.from(
-    new Set([...BskyAgent.appLabelers, ...additionalLabelers]),
+    new Set([
+      ...(persisted.get('crackSettings')?.removeAppLabelers
+        ? []
+        : BskyAgent.appLabelers),
+      ...additionalLabelers,
+    ]),
   )
 
   logger.info(`applying mod authorities`, {

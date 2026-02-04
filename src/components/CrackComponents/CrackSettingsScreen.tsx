@@ -19,7 +19,11 @@ import {
   useSetStatsigGateOverride,
   useStatsigGateOverrides,
 } from '#/state/crack/statsig-overrides'
-import {emitOpenSettingsHelpModal, emitOpenWelcomeModal} from '#/state/events'
+import {
+  emitOpenNuxDialog,
+  emitOpenSettingsHelpModal,
+  emitOpenWelcomeModal,
+} from '#/state/events'
 import {
   type CrackSettings,
   type CrackSettingsButtonItem,
@@ -28,6 +32,7 @@ import {
   useCrackSettings,
   useCrackSettingsApi,
 } from '#/state/preferences'
+import {type Nux, nuxNames} from '#/state/queries/nuxs/definitions'
 import {atoms as a, useBreakpoints, useTheme} from '#/alf'
 import {Button} from '#/components/Button'
 import {Divider} from '#/components/Divider'
@@ -82,6 +87,14 @@ export function CrackSettingsScreen({}: Props) {
       case 'openAlterEgo':
         navigation.navigate('CrackAlterEgoSettings')
         break
+      default: {
+        if (item.id.startsWith('openNux:')) {
+          const rawId = item.id.replace('openNux:', '') as Nux
+          if (nuxNames.has(rawId)) {
+            emitOpenNuxDialog(rawId)
+          }
+        }
+      }
     }
   }
 
@@ -165,6 +178,7 @@ function getItemIcon(item: CrackSettingsSection['items'][number]) {
     if (item.key === 'customVerificationsEnabled') return CircleCheckIcon
     if (item.key === 'hijackHideLabels') return CircleXIcon
     if (item.key === 'uncapLabelerLimit') return ShieldIcon
+    if (item.key === 'removeAppLabelers') return ShieldIcon
 
     return FilterIcon
   }

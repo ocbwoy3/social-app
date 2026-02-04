@@ -1,5 +1,7 @@
 import EventEmitter from 'eventemitter3'
 
+import {type Nux} from '#/state/queries/nuxs/definitions'
+
 type UnlistenFn = () => void
 
 const emitter = new EventEmitter()
@@ -60,4 +62,12 @@ export function emitOpenSettingsHelpModal() {
 export function listenOpenSettingsHelpModal(fn: () => void): UnlistenFn {
   emitter.on('open-settings-help-modal', fn)
   return () => emitter.off('open-settings-help-modal', fn)
+}
+
+export function emitOpenNuxDialog(id: Nux) {
+  emitter.emit('open-nux-dialog', id)
+}
+export function listenOpenNuxDialog(fn: (id: Nux) => void): UnlistenFn {
+  emitter.on('open-nux-dialog', fn)
+  return () => emitter.off('open-nux-dialog', fn)
 }

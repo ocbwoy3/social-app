@@ -1,6 +1,7 @@
 import {BSKY_LABELER_DID, BskyAgent} from '@atproto/api'
 
 import {IS_TEST_USER} from '#/lib/constants'
+import * as persisted from '#/state/persisted'
 import {configureAdditionalModerationAuthorities} from './additional-moderation-authorities'
 import {readLabelers} from './agent-config'
 import {type SessionAccount} from './types'
@@ -37,11 +38,20 @@ export async function configureModerationForAccount(
   configureAdditionalModerationAuthorities()
 }
 
+function shouldRemoveAppLabelers() {
+  return persisted.get('crackSettings')?.removeAppLabelers === true
+}
+
 function switchToBskyAppLabeler() {
+  if (shouldRemoveAppLabelers()) {
+    BskyAgent.configure({appLabelers: []})
+    return
+  }
   BskyAgent.configure({appLabelers: [BSKY_LABELER_DID]})
 }
 
 async function trySwitchToTestAppLabeler(agent: BskyAgent) {
+  if (shouldRemoveAppLabelers()) return
   const did = (
     await agent
       .resolveHandle({handle: 'mod-authority.test'})
