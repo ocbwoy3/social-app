@@ -27,6 +27,10 @@ import {
   enabled as isLiveNowBetaDialogEnabled,
   LiveNowBetaDialog,
 } from '#/components/dialogs/nuxs/LiveNowBetaDialog'
+import {
+  DraftsAnnouncement,
+  enabled as isDraftsAnnouncementEnabled,
+} from '#/components/dialogs/nuxs/DraftsAnnouncement'
 import {isSnoozed, snooze, unsnooze} from '#/components/dialogs/nuxs/snoozing'
 import {type EnabledCheckProps} from '#/components/dialogs/nuxs/utils'
 import {useAnalytics} from '#/analytics'
@@ -41,6 +45,10 @@ const queuedNuxs: {
   id: Nux
   enabled?: (props: EnabledCheckProps) => boolean
 }[] = [
+  {
+    id: Nux.DraftsAnnouncement,
+    enabled: isDraftsAnnouncementEnabled,
+  },
   {
     id: Nux.LiveNowBetaDialog,
     enabled: isLiveNowBetaDialogEnabled,
@@ -207,6 +215,7 @@ function Inner({
       {activeNux === Nux.BookmarksAnnouncement && <BookmarksAnnouncement />}
       {activeNux === Nux.ActivitySubscriptions && <ActivitySubscriptionsNUX />}
       {activeNux === Nux.LiveNowBetaDialog && <LiveNowBetaDialog />}
+      {activeNux === Nux.DraftsAnnouncement && <DraftsAnnouncement />}
     </Context.Provider>
   )
 }
