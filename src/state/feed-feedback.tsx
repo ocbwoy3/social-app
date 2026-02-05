@@ -172,7 +172,7 @@ export function useFeedFeedback(
     )
     throttledFlushAggregatedStats()
     logger.debug('flushed')
-  }, [agent, throttledFlushAggregatedStats, proxyDid, enabled, feed])
+  }, [agent, throttledFlushAggregatedStats, proxyDid, enabled, feed, logger])
 
   const sendToFeed = useMemo(
     () =>
@@ -233,7 +233,7 @@ export function useFeedFeedback(
         sendToFeed()
       }
     },
-    [enabled, sendToFeed],
+    [enabled, sendToFeed, logger],
   )
 
   return useMemo(() => {

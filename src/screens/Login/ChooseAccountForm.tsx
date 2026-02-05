@@ -69,6 +69,7 @@ export const ChooseAccountForm = ({
       onSelectAccount,
       setShowLoggedOut,
       _,
+      ax,
     ],
   )
 

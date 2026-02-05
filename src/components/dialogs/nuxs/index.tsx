@@ -21,16 +21,16 @@ import {type SessionAccount, useSession} from '#/state/session'
 import {useOnboardingState} from '#/state/shell'
 import {ActivitySubscriptionsNUX} from '#/components/dialogs/nuxs/ActivitySubscriptions'
 import {BookmarksAnnouncement} from '#/components/dialogs/nuxs/BookmarksAnnouncement'
+import {
+  DraftsAnnouncement,
+  enabled as isDraftsAnnouncementEnabled,
+} from '#/components/dialogs/nuxs/DraftsAnnouncement'
 import {FindContactsAnnouncement} from '#/components/dialogs/nuxs/FindContactsAnnouncement'
 import {InitialVerificationAnnouncement} from '#/components/dialogs/nuxs/InitialVerificationAnnouncement'
 import {
   enabled as isLiveNowBetaDialogEnabled,
   LiveNowBetaDialog,
 } from '#/components/dialogs/nuxs/LiveNowBetaDialog'
-import {
-  DraftsAnnouncement,
-  enabled as isDraftsAnnouncementEnabled,
-} from '#/components/dialogs/nuxs/DraftsAnnouncement'
 import {isSnoozed, snooze, unsnooze} from '#/components/dialogs/nuxs/snoozing'
 import {type EnabledCheckProps} from '#/components/dialogs/nuxs/utils'
 import {useAnalytics} from '#/analytics'

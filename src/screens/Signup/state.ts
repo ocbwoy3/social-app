@@ -370,6 +370,6 @@ export function useSubmitSignup() {
         dispatch({type: 'setIsLoading', value: false})
       }
     },
-    [_, onboardingDispatch, createAccount],
+    [_, onboardingDispatch, createAccount, ax],
   )
 }

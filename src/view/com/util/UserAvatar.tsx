@@ -548,7 +548,7 @@ let PreviewableUserAvatar = ({
     playHaptic('Light')
     ax.metric('live:card:open', {subject: profile.did, from: 'post'})
     liveControl.open()
-  }, [liveControl, playHaptic, profile.did])
+  }, [liveControl, playHaptic, profile.did, ax])
 
   const avatarEl = (
     <AgField field="avatar" value={profile.avatar} did={profile.did}>

@@ -982,7 +982,7 @@ let PostFeed = ({
         }
       }
     },
-    [feedFeedback, feed, liveNowConfig, getPostPosition],
+    [feedFeedback, feed, liveNowConfig, getPostPosition, ax],
   )
 
   return (

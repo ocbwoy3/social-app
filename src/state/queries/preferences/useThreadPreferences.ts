@@ -89,7 +89,7 @@ export function useThreadPreferences({
         setIsSaving(false)
       }
     }, 4e3)
-  }, [mutateAsync])
+  }, [mutateAsync, ax])
 
   if (save && userUpdatedPrefs.current) {
     savePrefs({

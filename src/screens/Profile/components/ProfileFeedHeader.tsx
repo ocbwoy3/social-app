@@ -431,7 +431,7 @@ function DialogInner({
     const url = toShareUrl(info.route.href)
     shareUrl(url)
     ax.metric('feed:share', {feedUrl: info.uri})
-  }, [info, playHaptic])
+  }, [info, playHaptic, ax])
 
   const onPressReport = React.useCallback(() => {
     reportDialogControl.open()

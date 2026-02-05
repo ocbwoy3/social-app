@@ -39,7 +39,7 @@ export function CustomFeedEmptyState() {
         })
       }
     }
-  }, [feedFeedback.feedSourceInfo, currentAccount?.did])
+  }, [feedFeedback.feedSourceInfo, currentAccount?.did, ax])
   const pal = usePalette('default')
   const palInverted = usePalette('inverted')
   const navigation = useNavigation<NavigationProp>()
