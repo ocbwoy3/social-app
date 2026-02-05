@@ -202,6 +202,13 @@ export const crackSettingsSections: CrackSettingsSection[] = [
       },
       {
         type: 'button',
+        id: 'openNux:DraftsAnnouncement',
+        label: 'DraftsAnnouncement',
+        description: 'Open NUX dialog.',
+        buttonLabel: 'Open',
+      },
+      {
+        type: 'button',
         id: 'openNux:LiveNowBetaDialog',
         label: 'LiveNowBetaDialog',
         description: 'Open NUX dialog.',
