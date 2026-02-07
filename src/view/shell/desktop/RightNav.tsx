@@ -97,7 +97,7 @@ export function DesktopRightNav({routeName}: {routeName: string}) {
 
       <Text style={[a.leading_snug, t.atoms.text_contrast_low]}>
         <InlineLinkText
-          to="https://github.com/ocbwoy3/bsky-on-crack"
+          to="https://tangled.org/ocbwoy3.dev/BlueskyOnCrack"
           style={[t.atoms.text_contrast_medium]}
           label={_(msg`Bluesky on Crack`)}>
           {_(msg`Bluesky on Crack`)} ({process.env.EXPO_PLATFORM ?? 'web'})
