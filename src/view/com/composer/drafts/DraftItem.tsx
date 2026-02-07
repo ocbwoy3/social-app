@@ -134,12 +134,14 @@ export function DraftItem({
               </View>
             )}
 
-            <RichText
-              style={[a.text_md, a.leading_snug, a.pointer_events_none]}
-              value={post.text}
-              enableTags
-              disableMentionFacetValidation
-            />
+            {!!post.text.trim().length && (
+              <RichText
+                style={[a.text_md, a.leading_snug, a.pointer_events_none]}
+                value={post.text}
+                enableTags
+                disableMentionFacetValidation
+              />
+            )}
 
             {!mediaExistsOnOtherDevice && <DraftMediaPreview post={post} />}
 
