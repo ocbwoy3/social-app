@@ -92,7 +92,9 @@ export function useAlterEgoOverlay(uri?: string) {
     loadAlterEgoOverlay({agent, uri})
   }, [agent, uri])
 
-  return useMemo(() => (uri ? alterEgoOverlayCache.get(uri) : undefined), [uri])
+  // Note: we intentionally read from the cache directly so updates propagate
+  // when the internal `_version` state is bumped by cache listeners.
+  return uri ? alterEgoOverlayCache.get(uri) : undefined
 }
 
 export function useAlterEgoOverlays(uris: string[]) {
@@ -126,13 +128,12 @@ export function useAlterEgoOverlays(uris: string[]) {
     }
   }, [agent, uniqueUris])
 
-  return useMemo(() => {
-    const overlays: Record<string, AlterEgoProfileOverlay | undefined> = {}
-    for (const uri of uris) {
-      overlays[uri] = alterEgoOverlayCache.get(uri)
-    }
-    return overlays
-  }, [uris])
+  // Same reasoning as `useAlterEgoOverlay`.
+  const overlays: Record<string, AlterEgoProfileOverlay | undefined> = {}
+  for (const uri of uris) {
+    overlays[uri] = alterEgoOverlayCache.get(uri)
+  }
+  return overlays
 }
 
 export function resolveAlterEgoBlobRefToUrl({
@@ -209,17 +210,27 @@ export async function fetchAlterEgoProfile({
     banner,
     displayName: record.displayName,
     description: record.description,
+    pronouns: record.pronouns,
+    website: record.website,
     handle: record.handle,
   }
 }
 
 export function useActiveAlterEgo(did: string) {
   const settings = useCrackSettings()
+  const parsedGlobal = settings.alterEgoUri
+    ? parseAlterEgoUri(settings.alterEgoUri)
+    : null
+  const activeUri =
+    settings.alterEgoByDid?.[did] ||
+    (parsedGlobal?.repo === did ? settings.alterEgoUri : undefined)
+  const overlay = useAlterEgoOverlay(activeUri)
   if (!settings.alterEgoEnabled) {
     return undefined
   }
-  const activeUri = settings.alterEgoByDid?.[did]
-  return activeUri ? settings.alterEgoRecords?.[activeUri] : undefined
+  return activeUri
+    ? (overlay ?? settings.alterEgoRecords?.[activeUri])
+    : undefined
 }
 
 export function useAlterEgoProfileFields<T extends {did: string}>(
@@ -229,6 +240,8 @@ export function useAlterEgoProfileFields<T extends {did: string}>(
   banner?: string
   displayName?: string
   description?: string
+  pronouns?: string
+  website?: string
   handle?: string
 } {
   const alter = useActiveAlterEgo(profile.did)
@@ -240,6 +253,8 @@ export function useAlterEgoProfileFields<T extends {did: string}>(
       alter?.displayName ?? (profile as {displayName?: string}).displayName,
     description:
       alter?.description ?? (profile as {description?: string}).description,
+    pronouns: alter?.pronouns ?? (profile as {pronouns?: string}).pronouns,
+    website: alter?.website ?? (profile as {website?: string}).website,
     handle: alter?.handle ?? (profile as {handle?: string}).handle,
   }
 }
@@ -249,6 +264,8 @@ export function useAlterEgoProfileFieldsOfManyDids(dids: string[]): {
   banner?: string
   displayName?: string
   description?: string
+  pronouns?: string
+  website?: string
   handle?: string
 }[] {
   const settings = useCrackSettings()
@@ -265,6 +282,8 @@ export function useAlterEgoProfileFieldsOfManyDids(dids: string[]): {
         banner: overlay?.banner,
         displayName: overlay?.displayName,
         description: overlay?.description,
+        pronouns: overlay?.pronouns,
+        website: overlay?.website,
         handle: overlay?.handle,
       }
     })

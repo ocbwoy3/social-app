@@ -16,6 +16,9 @@ export enum Nux {
   LiveNowBetaNudge = 'LiveNowBetaNudge',
   DraftsAnnouncement = 'DraftsAnnouncement',
 
+  // Bluesky on Crack custom NUX dialogs
+  CrackPronounsBetaNuxDialog = 'CrackPronounsBetaNuxDialog',
+
   /*
    * Blocking announcements. New IDs are required for each new announcement.
    */
@@ -77,6 +80,10 @@ export type AppNux = BaseNux<
       id: Nux.DraftsAnnouncement
       data: undefined
     }
+  | {
+      id: Nux.CrackPronounsBetaNuxDialog
+      data: undefined
+    }
 >
 
 export const NuxSchemas: Record<Nux, zod.ZodObject<any> | undefined> = {
@@ -93,4 +100,5 @@ export const NuxSchemas: Record<Nux, zod.ZodObject<any> | undefined> = {
   [Nux.LiveNowBetaDialog]: undefined,
   [Nux.LiveNowBetaNudge]: undefined,
   [Nux.DraftsAnnouncement]: undefined,
+  [Nux.CrackPronounsBetaNuxDialog]: undefined,
 }

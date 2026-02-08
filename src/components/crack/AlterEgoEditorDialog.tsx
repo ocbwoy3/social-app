@@ -14,6 +14,7 @@ import {compressIfNeeded} from '#/lib/media/manip'
 import {type PickerImage} from '#/lib/media/picker.shared'
 import {cleanError} from '#/lib/strings/errors'
 import {isOverMaxGraphemeCount} from '#/lib/strings/helpers'
+import {definitelyUrl} from '#/lib/strings/url-helpers'
 import {logger} from '#/logger'
 import {
   fetchAlterEgoProfile,
@@ -37,11 +38,16 @@ const MAX_IMAGE_SIZE = 1024 * 1024
 const MAX_HANDLE_LENGTH = 64
 const MAX_DESCRIPTION_LENGTH = 3000
 const MAX_DISPLAY_NAME_LENGTH = 64
+const MAX_PRONOUNS_LENGTH = 200
+const MAX_PRONOUNS_GRAPHEMES = 20
+const MAX_WEBSITE_LENGTH = 300
 
 type InitialValues = {
   displayName: string
   handle: string
   description: string
+  pronouns: string
+  website: string
   avatar: string | null
   banner: string | null
 }
@@ -125,6 +131,8 @@ function DialogInner({
   const [displayName, setDisplayName] = useState('')
   const [handle, setHandle] = useState('')
   const [description, setDescription] = useState('')
+  const [pronouns, setPronouns] = useState('')
+  const [website, setWebsite] = useState('')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [newAvatar, setNewAvatar] = useState<PickerImage | null | undefined>()
@@ -135,6 +143,8 @@ function DialogInner({
     displayName: '',
     handle: '',
     description: '',
+    pronouns: '',
+    website: '',
     avatar: null,
     banner: null,
   })
@@ -148,6 +158,8 @@ function DialogInner({
         setDisplayName('')
         setHandle('')
         setDescription('')
+        setPronouns('')
+        setWebsite('')
         setAvatarPreview(null)
         setBannerPreview(null)
         setNewAvatar(undefined)
@@ -157,6 +169,8 @@ function DialogInner({
           displayName: '',
           handle: '',
           description: '',
+          pronouns: '',
+          website: '',
           avatar: null,
           banner: null,
         })
@@ -177,6 +191,8 @@ function DialogInner({
         setDisplayName(value.displayName ?? '')
         setHandle(value.handle ?? '')
         setDescription(value.description ?? '')
+        setPronouns(value.pronouns ?? '')
+        setWebsite(value.website ?? '')
         let resolvedAvatar: string | null = null
         let resolvedBanner: string | null = null
         try {
@@ -211,6 +227,8 @@ function DialogInner({
           displayName: value.displayName ?? '',
           handle: value.handle ?? '',
           description: value.description ?? '',
+          pronouns: value.pronouns ?? '',
+          website: value.website ?? '',
           avatar: resolvedAvatar,
           banner: resolvedBanner,
         })
@@ -275,6 +293,9 @@ function DialogInner({
     const nextDisplayName = displayName.trim()
     const nextHandle = handle.trim()
     const nextDescription = description.trim()
+    const nextPronouns = pronouns.trim()
+    const nextWebsiteRaw = website.trim()
+    const nextWebsite = nextWebsiteRaw ? definitelyUrl(nextWebsiteRaw) : null
 
     if (nextHandle.length > MAX_HANDLE_LENGTH) {
       setError(_(msg`Handle must be 64 characters or less.`))
@@ -288,6 +309,27 @@ function DialogInner({
       setError(_(msg`Display name must be 64 characters or less.`))
       return
     }
+    if (nextPronouns.length > MAX_PRONOUNS_LENGTH) {
+      setError(_(msg`Pronouns must be 200 characters or less.`))
+      return
+    }
+    if (
+      isOverMaxGraphemeCount({
+        text: nextPronouns,
+        maxCount: MAX_PRONOUNS_GRAPHEMES,
+      })
+    ) {
+      setError(_(msg`Pronouns are too long.`))
+      return
+    }
+    if (nextWebsiteRaw && !nextWebsite) {
+      setError(_(msg`Website must be a valid URL.`))
+      return
+    }
+    if (nextWebsite && nextWebsite.length > MAX_WEBSITE_LENGTH) {
+      setError(_(msg`Website must be 300 characters or less.`))
+      return
+    }
 
     setIsSaving(true)
     setError(null)
@@ -297,6 +339,8 @@ function DialogInner({
         displayName: nextDisplayName || undefined,
         handle: nextHandle || undefined,
         description: nextDescription || undefined,
+        pronouns: nextPronouns || undefined,
+        website: nextWebsite || undefined,
       }
 
       if (newAvatar) {
@@ -358,6 +402,8 @@ function DialogInner({
     displayName !== initialValues.displayName ||
     handle !== initialValues.handle ||
     description !== initialValues.description ||
+    pronouns !== initialValues.pronouns ||
+    website !== initialValues.website ||
     avatarPreview !== initialValues.avatar ||
     bannerPreview !== initialValues.banner
 
@@ -373,7 +419,19 @@ function DialogInner({
     text: description,
     maxCount: MAX_DESCRIPTION_LENGTH,
   })
+  const pronounsTooLong = isOverMaxGraphemeCount({
+    text: pronouns,
+    maxCount: MAX_PRONOUNS_GRAPHEMES,
+  })
   const handleTooLong = handle.length > MAX_HANDLE_LENGTH
+  const websiteTrimmed = website.trim()
+  const websiteNormalized = websiteTrimmed
+    ? definitelyUrl(websiteTrimmed)
+    : null
+  const websiteTooLong = Boolean(
+    websiteNormalized && websiteNormalized.length > MAX_WEBSITE_LENGTH,
+  )
+  const websiteInvalid = Boolean(websiteTrimmed && !websiteNormalized)
 
   return (
     <Dialog.ScrollableInner
@@ -404,7 +462,10 @@ function DialogInner({
                 isSaving ||
                 displayNameTooLong ||
                 descriptionTooLong ||
-                handleTooLong
+                pronounsTooLong ||
+                handleTooLong ||
+                websiteTooLong ||
+                websiteInvalid
               }
               size="small"
               color="primary"
@@ -535,6 +596,65 @@ function DialogInner({
                 value={MAX_DESCRIPTION_LENGTH}
                 other="Description is too long. The maximum number of characters is #."
               />
+            </Text>
+          )}
+        </View>
+
+        <View>
+          <TextField.LabelText>
+            <Trans>Pronouns</Trans>
+          </TextField.LabelText>
+          <TextField.Root isInvalid={pronounsTooLong}>
+            <Dialog.Input
+              defaultValue={pronouns}
+              onChangeText={setPronouns}
+              label={_(msg`Pronouns`)}
+              placeholder={_(msg`e.g. they/them`)}
+            />
+          </TextField.Root>
+          {pronounsTooLong && (
+            <Text
+              style={[
+                a.text_sm,
+                a.mt_xs,
+                a.font_semi_bold,
+                {color: t.palette.negative_400},
+              ]}>
+              <Plural
+                value={MAX_PRONOUNS_GRAPHEMES}
+                other="Pronouns are too long. The maximum number of characters is #."
+              />
+            </Text>
+          )}
+        </View>
+
+        <View>
+          <TextField.LabelText>
+            <Trans>Website</Trans>
+          </TextField.LabelText>
+          <TextField.Root isInvalid={websiteTooLong || websiteInvalid}>
+            <Dialog.Input
+              defaultValue={website}
+              onChangeText={setWebsite}
+              label={_(msg`Website`)}
+              placeholder={_(msg`https://example.com`)}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </TextField.Root>
+          {(websiteTooLong || websiteInvalid) && (
+            <Text
+              style={[
+                a.text_sm,
+                a.mt_xs,
+                a.font_semi_bold,
+                {color: t.palette.negative_400},
+              ]}>
+              {websiteTooLong ? (
+                <Trans>Website must be 300 characters or less.</Trans>
+              ) : (
+                <Trans>This is not a valid link</Trans>
+              )}
             </Text>
           )}
         </View>

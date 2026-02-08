@@ -127,22 +127,33 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
             )}
             <AgField field="handle" value={handle} did={author.did}>
               {alterHandle => (
-                <WebOnlyInlineLinkText
-                  emoji
-                  numberOfLines={1}
-                  to={profileLink}
-                  label={_(msg`View profile`)}
-                  disableMismatchWarning
-                  disableUnderline
-                  onPress={onBeforePressAuthor}
-                  style={[
-                    a.text_md,
-                    t.atoms.text_contrast_medium,
-                    a.leading_tight,
-                    {flexShrink: 10},
-                  ]}>
-                  {NON_BREAKING_SPACE + sanitizeHandle(alterHandle, '@')}
-                </WebOnlyInlineLinkText>
+                <AgField
+                  field="pronouns"
+                  value={author.pronouns ?? ''}
+                  did={author.did}>
+                  {pronounsValue => (
+                    <WebOnlyInlineLinkText
+                      emoji
+                      numberOfLines={1}
+                      to={profileLink}
+                      label={_(msg`View profile`)}
+                      disableMismatchWarning
+                      disableUnderline
+                      onPress={onBeforePressAuthor}
+                      style={[
+                        a.text_md,
+                        t.atoms.text_contrast_medium,
+                        a.leading_tight,
+                        {flexShrink: 10},
+                      ]}>
+                      {NON_BREAKING_SPACE +
+                        sanitizeHandle(alterHandle, '@') +
+                        (pronounsValue && pronounsValue.trim()
+                          ? ` (${pronounsValue.trim()})`
+                          : '')}
+                    </WebOnlyInlineLinkText>
+                  )}
+                </AgField>
               )}
             </AgField>
           </View>

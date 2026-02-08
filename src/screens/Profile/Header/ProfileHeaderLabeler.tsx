@@ -11,10 +11,10 @@ import {
 import {msg, Plural, plural, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {MAX_LABELERS} from '#/lib/constants'
 import {useHaptics} from '#/lib/haptics'
+import {useOpenLink} from '#/lib/hooks/useOpenLink'
 import {isAppLabeler} from '#/lib/moderation'
+import {definitelyUrl, toShortUrl} from '#/lib/strings/url-helpers'
 import {useProfileShadow} from '#/state/cache/profile-shadow'
 import {type Shadow} from '#/state/cache/types'
 import {useLabelerSubscriptionMutation} from '#/state/queries/labeler'
@@ -27,11 +27,12 @@ import {Button, ButtonText} from '#/components/Button'
 import {AgField} from '#/components/crack/AgField'
 import {type DialogOuterProps, useDialogControl} from '#/components/Dialog'
 import {useRichText} from '#/components/hooks/useRichText'
+import {ChainLink_Stroke2_Corner0_Rounded as ChainLinkIcon} from '#/components/icons/ChainLink'
 import {
   Heart2_Filled_Stroke2_Corner0_Rounded as HeartFilled,
   Heart2_Stroke2_Corner0_Rounded as Heart,
 } from '#/components/icons/Heart2'
-import {Link} from '#/components/Link'
+import {createStaticClick, InlineLinkText, Link} from '#/components/Link'
 import * as Prompt from '#/components/Prompt'
 import {RichText} from '#/components/RichText'
 import * as Toast from '#/components/Toast'
@@ -69,6 +70,10 @@ let ProfileHeaderLabeler = ({
   const {currentAccount, hasSession} = useSession()
   const playHaptic = useHaptics()
   const isSelf = currentAccount?.did === profile.did
+  const isBlockedUser =
+    profile.viewer?.blocking ||
+    profile.viewer?.blockedBy ||
+    profile.viewer?.blockingByList
 
   const moderation = useMemo(
     () => moderateProfile(profile, moderationOpts),
@@ -79,6 +84,9 @@ let ProfileHeaderLabeler = ({
     useUnlikeMutation()
   const [likeUri, setLikeUri] = useState(labeler.viewer?.like || '')
   const [likeCount, setLikeCount] = useState(labeler.likeCount || 0)
+  const openWebsitePromptControl = Prompt.usePromptControl()
+  const [websiteToOpen, setWebsiteToOpen] = useState('')
+  const openLink = useOpenLink()
 
   const onToggleLiked = useCallback(async () => {
     if (!labeler) {
@@ -197,9 +205,60 @@ let ProfileHeaderLabeler = ({
                 )}
               </View>
             )}
+
+            {!isBlockedUser && !moderation.ui('profileView').blur && (
+              <AgField
+                field="website"
+                value={profile.website ?? ''}
+                did={profile.did}>
+                {websiteValue => {
+                  const websiteUrl = websiteValue
+                    ? definitelyUrl(websiteValue)
+                    : null
+                  if (!websiteUrl) return null
+                  const websiteLabel = toShortUrl(websiteUrl)
+                  return (
+                    <View
+                      style={[a.flex_row, a.align_center, a.gap_xs, a.pt_lg]}>
+                      <ChainLinkIcon
+                        size="sm"
+                        style={[t.atoms.text_contrast_medium]}
+                      />
+                      <InlineLinkText
+                        {...createStaticClick(() => {
+                          setWebsiteToOpen(websiteUrl)
+                          openWebsitePromptControl.open()
+                        })}
+                        label={_(msg`Open website`)}
+                        disableMismatchWarning
+                        numberOfLines={1}
+                        style={[
+                          a.text_md,
+                          a.leading_snug,
+                          t.atoms.text_contrast_medium,
+                        ]}>
+                        {websiteLabel}
+                      </InlineLinkText>
+                    </View>
+                  )
+                }}
+              </AgField>
+            )}
           </>
         )}
       </View>
+
+      <Prompt.Basic
+        control={openWebsitePromptControl}
+        title={_(msg`Open link?`)}
+        description={websiteToOpen || undefined}
+        confirmButtonCta={_(msg`Open link`)}
+        onConfirm={() => {
+          if (websiteToOpen) {
+            openLink(websiteToOpen)
+          }
+        }}
+      />
     </ProfileHeaderShell>
   )
 }

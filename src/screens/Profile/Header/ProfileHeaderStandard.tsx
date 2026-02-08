@@ -12,8 +12,10 @@ import {useLingui} from '@lingui/react'
 
 import {useActorStatus} from '#/lib/actor-status'
 import {useHaptics} from '#/lib/haptics'
+import {useOpenLink} from '#/lib/hooks/useOpenLink'
 import {sanitizeDisplayName} from '#/lib/strings/display-names'
 import {sanitizeHandle} from '#/lib/strings/handles'
+import {definitelyUrl, toShortUrl} from '#/lib/strings/url-helpers'
 import {logger} from '#/logger'
 import {type Shadow, useProfileShadow} from '#/state/cache/profile-shadow'
 import {
@@ -30,11 +32,13 @@ import {DebugFieldDisplay} from '#/components/DebugFieldDisplay'
 import {useDialogControl} from '#/components/Dialog'
 import {MessageProfileButton} from '#/components/dms/MessageProfileButton'
 import {useRichText} from '#/components/hooks/useRichText'
+import {ChainLink_Stroke2_Corner0_Rounded as ChainLinkIcon} from '#/components/icons/ChainLink'
 import {PlusLarge_Stroke2_Corner0_Rounded as Plus} from '#/components/icons/Plus'
 import {
   KnownFollowers,
   shouldShowKnownFollowers,
 } from '#/components/KnownFollowers'
+import {createStaticClick, InlineLinkText} from '#/components/Link'
 import * as Prompt from '#/components/Prompt'
 import {RichText} from '#/components/RichText'
 import * as Toast from '#/components/Toast'
@@ -74,6 +78,8 @@ let ProfileHeaderStandard = ({
   )
   const [, queueUnblock] = useProfileBlockMutationQueue(profile)
   const unblockPromptControl = Prompt.usePromptControl()
+  const openWebsitePromptControl = Prompt.usePromptControl()
+  const [websiteToOpen, setWebsiteToOpen] = useState('')
   const [showSuggestedFollows, setShowSuggestedFollows] = useState(false)
   const isBlockedUser =
     profile.viewer?.blocking ||
@@ -95,6 +101,7 @@ let ProfileHeaderStandard = ({
   const isMe = currentAccount?.did === profile.did
 
   const {isActive: live} = useActorStatus(profile)
+  const openLink = useOpenLink()
 
   return (
     <>
@@ -195,6 +202,44 @@ let ProfileHeaderStandard = ({
                     />
                   </View>
                 )}
+
+              {!moderation.ui('profileView').blur && (
+                <AgField
+                  field="website"
+                  value={profile.website ?? ''}
+                  did={profile.did}>
+                  {websiteValue => {
+                    const websiteUrl = websiteValue
+                      ? definitelyUrl(websiteValue)
+                      : null
+                    if (!websiteUrl) return null
+                    const websiteLabel = toShortUrl(websiteUrl)
+                    return (
+                      <View style={[a.flex_row, a.align_center, a.gap_xs]}>
+                        <ChainLinkIcon
+                          size="sm"
+                          style={[t.atoms.text_contrast_medium]}
+                        />
+                        <InlineLinkText
+                          {...createStaticClick(() => {
+                            setWebsiteToOpen(websiteUrl)
+                            openWebsitePromptControl.open()
+                          })}
+                          label={_(msg`Open website`)}
+                          disableMismatchWarning
+                          numberOfLines={1}
+                          style={[
+                            a.text_md,
+                            a.leading_snug,
+                            t.atoms.text_contrast_medium,
+                          ]}>
+                          {websiteLabel}
+                        </InlineLinkText>
+                      </View>
+                    )
+                  }}
+                </AgField>
+              )}
             </View>
           )}
 
@@ -212,6 +257,18 @@ let ProfileHeaderStandard = ({
             profile.viewer?.blocking ? _(msg`Unblock`) : _(msg`Block`)
           }
           confirmButtonColor="negative"
+        />
+
+        <Prompt.Basic
+          control={openWebsitePromptControl}
+          title={_(msg`Open link?`)}
+          description={websiteToOpen || undefined}
+          confirmButtonCta={_(msg`Open link`)}
+          onConfirm={() => {
+            if (websiteToOpen) {
+              openLink(websiteToOpen)
+            }
+          }}
         />
       </ProfileHeaderShell>
 

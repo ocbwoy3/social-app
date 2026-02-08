@@ -64,7 +64,7 @@ export function Provider({children}: React.PropsWithChildren<{}>) {
     [setState],
   )
 
-  const queueRemoteSync = React.useCallback(() => {}, [])
+  const queueRemoteSync = React.useCallback((_next: CrackSettings) => {}, [])
 
   const set = React.useCallback(
     (next: CrackSettings) => {

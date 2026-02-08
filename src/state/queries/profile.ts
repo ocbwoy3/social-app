@@ -178,6 +178,13 @@ export function useProfileUpdateMutation() {
         } else {
           next.displayName = updates.displayName
           next.description = updates.description
+          // new optional profile fields
+          if ('pronouns' in updates) {
+            next.pronouns = updates.pronouns
+          }
+          if ('website' in updates) {
+            next.website = updates.website
+          }
           if ('pinnedPost' in updates) {
             next.pinnedPost = updates.pinnedPost
           }
@@ -224,7 +231,13 @@ export function useProfileUpdateMutation() {
             }
             return (
               res.data.displayName === updates.displayName &&
-              res.data.description === updates.description
+              res.data.description === updates.description &&
+              ('pronouns' in updates
+                ? res.data.pronouns === updates.pronouns
+                : true) &&
+              ('website' in updates
+                ? res.data.website === updates.website
+                : true)
             )
           }),
       )
