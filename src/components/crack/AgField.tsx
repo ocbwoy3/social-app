@@ -6,6 +6,7 @@ type AlterEgoField =
   | 'displayName'
   | 'handle'
   | 'description'
+  | 'pronouns'
   | 'avatar'
   | 'banner'
 

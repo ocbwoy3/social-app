@@ -4,6 +4,7 @@ import {msg, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
 import {isInvalidHandle, sanitizeHandle} from '#/lib/strings/handles'
+import {sanitizePronouns} from '#/lib/strings/pronouns'
 import {type Shadow} from '#/state/cache/types'
 import {atoms as a, useTheme, web} from '#/alf'
 import {AgField} from '#/components/crack/AgField'
@@ -37,6 +38,14 @@ export function ProfileHeaderHandle({
       <AgField field="handle" value={profile.handle} did={profile.did}>
         {handleValue => {
           const invalidHandle = isInvalidHandle(handleValue)
+          const pronounsValue = profile.pronouns
+            ? sanitizePronouns(
+                profile.pronouns,
+                // forceLTR handled by the sanitization function
+                IS_NATIVE,
+              )
+            : ''
+          const hasPronouns = Boolean(pronounsValue)
           return (
             <Text
               emoji
@@ -66,6 +75,7 @@ export function ProfileHeaderHandle({
                     // forceLTR handled by CSS above on web
                     IS_NATIVE,
                   )}
+              {!invalidHandle && hasPronouns ? ` (${pronounsValue})` : ''}
             </Text>
           )
         }}

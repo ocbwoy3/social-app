@@ -141,7 +141,11 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
                     a.leading_tight,
                     {flexShrink: 10},
                   ]}>
-                  {NON_BREAKING_SPACE + sanitizeHandle(alterHandle, '@')}
+                  {NON_BREAKING_SPACE +
+                    sanitizeHandle(alterHandle, '@') +
+                    (author.pronouns && author.pronouns.trim()
+                      ? ` (${author.pronouns.trim()})`
+                      : '')}
                 </WebOnlyInlineLinkText>
               )}
             </AgField>
