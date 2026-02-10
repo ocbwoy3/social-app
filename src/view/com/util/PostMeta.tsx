@@ -11,6 +11,7 @@ import {forceLTR} from '#/lib/strings/bidi'
 import {NON_BREAKING_SPACE} from '#/lib/strings/constants'
 import {sanitizeDisplayName} from '#/lib/strings/display-names'
 import {sanitizeHandle} from '#/lib/strings/handles'
+import {sanitizePronouns} from '#/lib/strings/pronouns'
 import {niceDate} from '#/lib/strings/time'
 import {useProfileShadow} from '#/state/cache/profile-shadow'
 import {precacheProfile} from '#/state/queries/profile'
@@ -127,26 +128,36 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
             )}
             <AgField field="handle" value={handle} did={author.did}>
               {alterHandle => (
-                <WebOnlyInlineLinkText
-                  emoji
-                  numberOfLines={1}
-                  to={profileLink}
-                  label={_(msg`View profile`)}
-                  disableMismatchWarning
-                  disableUnderline
-                  onPress={onBeforePressAuthor}
-                  style={[
-                    a.text_md,
-                    t.atoms.text_contrast_medium,
-                    a.leading_tight,
-                    {flexShrink: 10},
-                  ]}>
-                  {NON_BREAKING_SPACE +
-                    sanitizeHandle(alterHandle, '@') +
-                    (author.pronouns && author.pronouns.trim()
-                      ? ` (${author.pronouns.trim()})`
-                      : '')}
-                </WebOnlyInlineLinkText>
+                <AgField
+                  field="pronouns"
+                  value={
+                    (author as unknown as {pronouns?: string}).pronouns ?? ''
+                  }
+                  did={author.did}>
+                  {pronounsValue => {
+                    const pronouns = sanitizePronouns(pronounsValue, true)
+                    return (
+                      <WebOnlyInlineLinkText
+                        emoji
+                        numberOfLines={1}
+                        to={profileLink}
+                        label={_(msg`View profile`)}
+                        disableMismatchWarning
+                        disableUnderline
+                        onPress={onBeforePressAuthor}
+                        style={[
+                          a.text_md,
+                          t.atoms.text_contrast_medium,
+                          a.leading_tight,
+                          {flexShrink: 10},
+                        ]}>
+                        {NON_BREAKING_SPACE +
+                          sanitizeHandle(alterHandle, '@') +
+                          (pronouns ? `${NON_BREAKING_SPACE}${pronouns}` : '')}
+                      </WebOnlyInlineLinkText>
+                    )
+                  }}
+                </AgField>
               )}
             </AgField>
           </View>

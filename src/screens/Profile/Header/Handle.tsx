@@ -25,61 +25,80 @@ export function ProfileHeaderHandle({
 
   return (
     <View
-      style={[a.flex_row, a.gap_sm, a.align_center, {maxWidth: '100%'}]}
+      style={[a.flex_col, a.gap_sm, a.align_start, {maxWidth: '100%'}]}
       pointerEvents={disableTaps ? 'none' : IS_IOS ? 'auto' : 'box-none'}>
       <NewskieDialog profile={profile} disabled={disableTaps} />
       {profile.viewer?.followedBy && !blockHide ? (
-        <View style={[t.atoms.bg_contrast_50, a.rounded_xs, a.px_sm, a.py_xs]}>
+        <View style={[t.atoms.bg_contrast_25, a.rounded_xs, a.px_sm, a.py_xs]}>
           <Text style={[t.atoms.text, a.text_sm]}>
             <Trans>Follows you</Trans>
           </Text>
         </View>
       ) : undefined}
-      <AgField field="handle" value={profile.handle} did={profile.did}>
-        {handleValue => {
-          const invalidHandle = isInvalidHandle(handleValue)
-          const pronounsValue = profile.pronouns
-            ? sanitizePronouns(
-                profile.pronouns,
-                // forceLTR handled by the sanitization function
-                IS_NATIVE,
-              )
-            : ''
-          const hasPronouns = Boolean(pronounsValue)
-          return (
-            <Text
-              emoji
-              numberOfLines={1}
-              style={[
-                invalidHandle
-                  ? [
-                      a.border,
-                      a.text_xs,
-                      a.px_sm,
-                      a.py_xs,
-                      a.rounded_xs,
-                      {borderColor: t.palette.contrast_200},
-                    ]
-                  : [a.text_md, a.leading_snug, t.atoms.text_contrast_medium],
-                web({
-                  wordBreak: 'break-all',
-                  direction: 'ltr',
-                  unicodeBidi: 'isolate',
-                }),
-              ]}>
-              {invalidHandle
-                ? _(msg`⚠Invalid Handle`)
-                : sanitizeHandle(
-                    handleValue,
-                    '@',
-                    // forceLTR handled by CSS above on web
-                    IS_NATIVE,
-                  )}
-              {!invalidHandle && hasPronouns ? ` (${pronounsValue})` : ''}
-            </Text>
-          )
-        }}
-      </AgField>
+
+      <View style={[a.flex_row, a.flex_wrap, {gap: 6}]}>
+        <AgField field="handle" value={profile.handle} did={profile.did}>
+          {handleValue => {
+            const invalidHandle = isInvalidHandle(handleValue)
+            return (
+              <Text
+                emoji
+                numberOfLines={1}
+                style={[
+                  invalidHandle
+                    ? [
+                        a.border,
+                        a.text_xs,
+                        a.px_sm,
+                        a.py_xs,
+                        a.rounded_xs,
+                        {borderColor: t.palette.contrast_200},
+                      ]
+                    : [a.text_md, a.leading_snug, t.atoms.text_contrast_medium],
+                  web({
+                    wordBreak: 'break-all',
+                    direction: 'ltr',
+                    unicodeBidi: 'isolate',
+                  }),
+                ]}>
+                {invalidHandle
+                  ? _(msg`⚠Invalid Handle`)
+                  : sanitizeHandle(
+                      handleValue,
+                      '@',
+                      // forceLTR handled by CSS above on web
+                      IS_NATIVE,
+                    )}
+              </Text>
+            )
+          }}
+        </AgField>
+
+        <AgField
+          field="pronouns"
+          // Not part of ProfileViewDetailed typing everywhere, but present in AppView.
+          value={(profile as unknown as {pronouns?: string}).pronouns ?? ''}
+          did={profile.did}>
+          {pronounsValue => {
+            const pronouns = sanitizePronouns(
+              pronounsValue,
+              // forceLTR handled by the sanitization function
+              IS_NATIVE,
+            )
+            return pronouns ? (
+              <Text
+                style={[
+                  t.atoms.text_contrast_low,
+                  a.text_md,
+                  a.leading_snug,
+                  a.pb_sm,
+                ]}>
+                {pronouns}
+              </Text>
+            ) : null
+          }}
+        </AgField>
+      </View>
     </View>
   )
 }

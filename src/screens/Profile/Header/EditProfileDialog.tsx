@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
-import {Dimensions, Pressable, useWindowDimensions, View} from 'react-native'
+import {Pressable, useWindowDimensions, View} from 'react-native'
 import {type AppBskyActorDefs} from '@atproto/api'
 import {msg, Plural, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
@@ -33,8 +33,6 @@ const DISPLAY_NAME_MAX_GRAPHEMES = 64
 const PRONOUNS_MAX_GRAPHEMES = 20
 const WEBSITE_MAX_GRAPHEMES = 28
 const DESCRIPTION_MAX_GRAPHEMES = 256
-
-const SCREEN_HEIGHT = Dimensions.get('window').height
 
 export function EditProfileDialog({
   profile,
@@ -313,7 +311,7 @@ function DialogInner({
     <Dialog.ScrollableInner
       label={_(msg`Edit profile`)}
       style={[a.overflow_hidden]}
-      contentContainerStyle={[a.px_0, a.pt_0, {minHeight: SCREEN_HEIGHT}]}
+      contentContainerStyle={[a.px_0, a.pt_0]}
       header={
         <Dialog.Header renderLeft={cancelButton} renderRight={saveButton}>
           <Dialog.HeaderText>

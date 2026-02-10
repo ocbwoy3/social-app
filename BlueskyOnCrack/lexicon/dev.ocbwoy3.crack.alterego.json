@@ -37,6 +37,18 @@
                         "maxLength": 3000,
                         "description": "New profile bio (e.g. [[#1 Rated Salesman1997]])"
                     },
+                    "pronouns": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "maxGraphemes": 20,
+                        "description": "Free-form pronouns text."
+                    },
+                    "website": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 300,
+                        "description": "A personal website URL."
+                    },
                     "displayName": {
                         "type": "string",
                         "maxLength": 64,

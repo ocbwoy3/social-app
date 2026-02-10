@@ -1,9 +1,10 @@
-import {useEffect, useMemo, useState} from 'react'
-import {useWindowDimensions, View} from 'react-native'
+import {useEffect, useMemo, useRef, useState} from 'react'
+import {Pressable, useWindowDimensions, View} from 'react-native'
 import {msg, Plural, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
 import {uploadBlob} from '#/lib/api'
+import {HITSLOP_10} from '#/lib/constants'
 import {
   ALTER_EGO_COLLECTION,
   type AlterEgoRecord,
@@ -14,9 +15,11 @@ import {compressIfNeeded} from '#/lib/media/manip'
 import {type PickerImage} from '#/lib/media/picker.shared'
 import {cleanError} from '#/lib/strings/errors'
 import {isOverMaxGraphemeCount} from '#/lib/strings/helpers'
+import {isValidWebsiteFormat} from '#/lib/strings/website'
 import {logger} from '#/logger'
 import {
   fetchAlterEgoProfile,
+  primeAlterEgoOverlay,
   resolveAlterEgoBlobRefToUrl,
 } from '#/state/crack/alter-ego'
 import {useCrackSettings, useCrackSettingsApi} from '#/state/preferences'
@@ -25,10 +28,12 @@ import {ErrorMessage} from '#/view/com/util/error/ErrorMessage'
 import * as Toast from '#/view/com/util/Toast'
 import {EditableUserAvatar} from '#/view/com/util/UserAvatar'
 import {UserBanner} from '#/view/com/util/UserBanner'
-import {atoms as a, useTheme, web} from '#/alf'
+import {atoms as a, tokens, useTheme, web} from '#/alf'
 import {Button, ButtonIcon, ButtonText} from '#/components/Button'
 import * as Dialog from '#/components/Dialog'
 import * as TextField from '#/components/forms/TextField'
+import {CircleX_Stroke2_Corner0_Rounded as CircleX} from '#/components/icons/CircleX'
+import {Globe_Stroke2_Corner0_Rounded as Globe} from '#/components/icons/Globe'
 import {Loader} from '#/components/Loader'
 import * as Prompt from '#/components/Prompt'
 import {Text} from '#/components/Typography'
@@ -37,11 +42,15 @@ const MAX_IMAGE_SIZE = 1024 * 1024
 const MAX_HANDLE_LENGTH = 64
 const MAX_DESCRIPTION_LENGTH = 3000
 const MAX_DISPLAY_NAME_LENGTH = 64
+const PRONOUNS_MAX_GRAPHEMES = 20
+const WEBSITE_MAX_GRAPHEMES = 28
 
 type InitialValues = {
   displayName: string
   handle: string
   description: string
+  pronouns: string
+  website: string
   avatar: string | null
   banner: string | null
 }
@@ -125,6 +134,9 @@ function DialogInner({
   const [displayName, setDisplayName] = useState('')
   const [handle, setHandle] = useState('')
   const [description, setDescription] = useState('')
+  const [pronouns, setPronouns] = useState('')
+  const [website, setWebsite] = useState('')
+  const websiteInputRef = useRef<any>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [newAvatar, setNewAvatar] = useState<PickerImage | null | undefined>()
@@ -135,6 +147,8 @@ function DialogInner({
     displayName: '',
     handle: '',
     description: '',
+    pronouns: '',
+    website: '',
     avatar: null,
     banner: null,
   })
@@ -148,6 +162,8 @@ function DialogInner({
         setDisplayName('')
         setHandle('')
         setDescription('')
+        setPronouns('')
+        setWebsite('')
         setAvatarPreview(null)
         setBannerPreview(null)
         setNewAvatar(undefined)
@@ -157,6 +173,8 @@ function DialogInner({
           displayName: '',
           handle: '',
           description: '',
+          pronouns: '',
+          website: '',
           avatar: null,
           banner: null,
         })
@@ -177,6 +195,8 @@ function DialogInner({
         setDisplayName(value.displayName ?? '')
         setHandle(value.handle ?? '')
         setDescription(value.description ?? '')
+        setPronouns(value.pronouns ?? '')
+        setWebsite(value.website ?? '')
         let resolvedAvatar: string | null = null
         let resolvedBanner: string | null = null
         try {
@@ -211,6 +231,8 @@ function DialogInner({
           displayName: value.displayName ?? '',
           handle: value.handle ?? '',
           description: value.description ?? '',
+          pronouns: value.pronouns ?? '',
+          website: value.website ?? '',
           avatar: resolvedAvatar,
           banner: resolvedBanner,
         })
@@ -272,9 +294,12 @@ function DialogInner({
       setError(_(msg`You can only edit your own alter ego records.`))
       return
     }
-    const nextDisplayName = displayName.trim()
-    const nextHandle = handle.trim()
-    const nextDescription = description.trim()
+    const nextDisplayName = displayName.trimEnd()
+    const nextHandle = handle.trimEnd()
+    const nextDescription = description.trimEnd()
+    const nextPronouns = pronouns.trimEnd().toLowerCase()
+    const nextWebsiteRaw = website.trimEnd().toLowerCase()
+    const nextWebsite = nextWebsiteRaw || undefined
 
     if (nextHandle.length > MAX_HANDLE_LENGTH) {
       setError(_(msg`Handle must be 64 characters or less.`))
@@ -288,6 +313,28 @@ function DialogInner({
       setError(_(msg`Display name must be 64 characters or less.`))
       return
     }
+    if (
+      isOverMaxGraphemeCount({
+        text: nextPronouns,
+        maxCount: PRONOUNS_MAX_GRAPHEMES,
+      })
+    ) {
+      setError(_(msg`Pronouns are too long.`))
+      return
+    }
+    if (
+      isOverMaxGraphemeCount({
+        text: nextWebsiteRaw,
+        maxCount: WEBSITE_MAX_GRAPHEMES,
+      })
+    ) {
+      setError(_(msg`Website is too long.`))
+      return
+    }
+    if (!isValidWebsiteFormat(nextWebsiteRaw)) {
+      setError(_(msg`Website must be a valid URL.`))
+      return
+    }
     setIsSaving(true)
     setError(null)
     try {
@@ -296,6 +343,8 @@ function DialogInner({
         displayName: nextDisplayName || undefined,
         handle: nextHandle || undefined,
         description: nextDescription || undefined,
+        pronouns: nextPronouns || undefined,
+        website: nextWebsite,
       }
 
       if (newAvatar) {
@@ -334,6 +383,7 @@ function DialogInner({
       })
 
       const updatedOverlay = await fetchAlterEgoProfile({agent, uri})
+      primeAlterEgoOverlay(updatedOverlay)
       update({
         alterEgoRecords: {
           ...(settings.alterEgoRecords ?? {}),
@@ -357,6 +407,8 @@ function DialogInner({
     displayName !== initialValues.displayName ||
     handle !== initialValues.handle ||
     description !== initialValues.description ||
+    pronouns !== initialValues.pronouns ||
+    website !== initialValues.website ||
     avatarPreview !== initialValues.avatar ||
     bannerPreview !== initialValues.banner
 
@@ -372,7 +424,22 @@ function DialogInner({
     text: description,
     maxCount: MAX_DESCRIPTION_LENGTH,
   })
+  const pronounsTooLong = isOverMaxGraphemeCount({
+    text: pronouns,
+    maxCount: PRONOUNS_MAX_GRAPHEMES,
+  })
   const handleTooLong = handle.length > MAX_HANDLE_LENGTH
+  const websiteTooLong = isOverMaxGraphemeCount({
+    text: website,
+    maxCount: WEBSITE_MAX_GRAPHEMES,
+  })
+  const websiteInvalidFormat = !isValidWebsiteFormat(website)
+  const onClearWebsite = () => {
+    setWebsite('')
+    if (websiteInputRef.current) {
+      websiteInputRef.current.clear()
+    }
+  }
 
   return (
     <Dialog.ScrollableInner
@@ -403,7 +470,10 @@ function DialogInner({
                 isSaving ||
                 displayNameTooLong ||
                 descriptionTooLong ||
-                handleTooLong
+                pronounsTooLong ||
+                handleTooLong ||
+                websiteTooLong ||
+                websiteInvalidFormat
               }
               size="small"
               color="primary"
@@ -534,6 +604,125 @@ function DialogInner({
                 value={MAX_DESCRIPTION_LENGTH}
                 other="Description is too long. The maximum number of characters is #."
               />
+            </Text>
+          )}
+        </View>
+
+        <View>
+          <TextField.LabelText>
+            <Trans>Pronouns</Trans>
+          </TextField.LabelText>
+          <TextField.Root isInvalid={pronounsTooLong}>
+            <Dialog.Input
+              defaultValue={pronouns}
+              onChangeText={setPronouns}
+              label={_(msg`Pronouns`)}
+              placeholder={_(msg`Pronouns`)}
+            />
+          </TextField.Root>
+          {pronounsTooLong && (
+            <Text
+              style={[
+                a.text_sm,
+                a.mt_xs,
+                a.font_semi_bold,
+                {color: t.palette.negative_400},
+              ]}>
+              <Plural
+                value={PRONOUNS_MAX_GRAPHEMES}
+                other="Pronouns are too long. The maximum number of characters is #."
+              />
+            </Text>
+          )}
+        </View>
+
+        <View>
+          <TextField.LabelText>
+            <Trans>Website</Trans>
+          </TextField.LabelText>
+          <View style={[a.w_full, a.relative]}>
+            <TextField.Root isInvalid={websiteTooLong || websiteInvalidFormat}>
+              {website && <TextField.Icon icon={Globe} />}
+              <Dialog.Input
+                inputRef={websiteInputRef}
+                defaultValue={website}
+                onChangeText={setWebsite}
+                label={_(msg`EditWebsite`)}
+                placeholder={_(msg`URL`)}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="url"
+                style={[
+                  website
+                    ? {
+                        paddingRight: tokens.space._5xl,
+                      }
+                    : {},
+                ]}
+              />
+            </TextField.Root>
+
+            {website && (
+              <View
+                style={[
+                  a.absolute,
+                  a.z_10,
+                  a.my_auto,
+                  a.inset_0,
+                  a.justify_center,
+                  a.pr_sm,
+                  {left: 'auto'},
+                ]}>
+                <Pressable
+                  onPress={onClearWebsite}
+                  accessibilityLabel={_(msg`Clear website`)}
+                  accessibilityHint={_(msg`Removes the website URL`)}
+                  hitSlop={HITSLOP_10}
+                  style={[
+                    a.flex_row,
+                    a.align_center,
+                    a.justify_center,
+                    {
+                      width: tokens.space._2xl,
+                      height: tokens.space._2xl,
+                    },
+                    a.rounded_full,
+                  ]}>
+                  <CircleX
+                    width={tokens.space.lg}
+                    style={{color: t.palette.contrast_600}}
+                  />
+                </Pressable>
+              </View>
+            )}
+          </View>
+
+          {websiteTooLong && (
+            <Text
+              style={[
+                a.text_sm,
+                a.mt_xs,
+                a.font_semi_bold,
+                {color: t.palette.negative_400},
+              ]}>
+              <Plural
+                value={WEBSITE_MAX_GRAPHEMES}
+                other="Website is too long. The maximum number of characters is #."
+              />
+            </Text>
+          )}
+
+          {websiteInvalidFormat && (
+            <Text
+              style={[
+                a.text_sm,
+                a.mt_xs,
+                a.font_semi_bold,
+                {color: t.palette.negative_400},
+              ]}>
+              <Trans>
+                Website must be a valid URL (e.g., https://bsky.app)
+              </Trans>
             </Text>
           )}
         </View>

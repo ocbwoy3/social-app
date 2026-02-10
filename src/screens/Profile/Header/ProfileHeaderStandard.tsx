@@ -88,9 +88,6 @@ let ProfileHeaderStandard = ({
     profile.viewer?.blockedBy ||
     profile.viewer?.blockingByList
 
-  const website = profile.website
-  const websiteFormatted = sanitizeWebsiteForDisplay(website ?? '')
-
   const dateJoined = useMemo(() => {
     if (!profile.createdAt) return ''
     return formatJoinDate(profile.createdAt)
@@ -212,37 +209,53 @@ let ProfileHeaderStandard = ({
                   </View>
                 )}
 
-              {!moderation.ui('profileView').blur &&
-                (websiteFormatted || dateJoined) && (
-                  <View style={[a.flex_row, a.flex_wrap, {gap: 10}, a.pt_md]}>
-                    {websiteFormatted && (
-                      <Link
-                        to={sanitizeWebsiteForLink(website || websiteFormatted)}
-                        label={_(msg`Open website`)}
-                        style={[a.flex_row, a.align_center, a.gap_xs]}>
-                        <Globe
-                          width={tokens.space.lg}
-                          style={{color: t.palette.primary_500}}
-                        />
-                        <Text style={[{color: t.palette.primary_500}]}>
-                          {websiteFormatted}
-                        </Text>
-                      </Link>
-                    )}
+              {!moderation.ui('profileView').blur && (
+                <AgField
+                  field="website"
+                  value={profile.website ?? ''}
+                  did={profile.did}>
+                  {websiteValue => {
+                    const websiteFormatted = sanitizeWebsiteForDisplay(
+                      websiteValue ?? '',
+                    )
+                    if (!websiteFormatted && !dateJoined) return null
 
-                    {dateJoined && (
-                      <View style={[a.flex_row, a.align_center, a.gap_xs]}>
-                        <CalendarDays
-                          width={tokens.space.lg}
-                          style={{color: t.atoms.text_contrast_medium.color}}
-                        />
-                        <Text style={[t.atoms.text_contrast_medium]}>
-                          <Trans>Joined {dateJoined}</Trans>
-                        </Text>
+                    return (
+                      <View
+                        style={[a.flex_row, a.flex_wrap, {gap: 10}, a.pt_md]}>
+                        {websiteFormatted ? (
+                          <Link
+                            to={sanitizeWebsiteForLink(websiteValue)}
+                            label={_(msg`Open website`)}
+                            style={[a.flex_row, a.align_center, a.gap_xs]}>
+                            <Globe
+                              width={tokens.space.lg}
+                              style={{color: t.palette.primary_500}}
+                            />
+                            <Text style={[{color: t.palette.primary_500}]}>
+                              {websiteFormatted}
+                            </Text>
+                          </Link>
+                        ) : null}
+
+                        {dateJoined ? (
+                          <View style={[a.flex_row, a.align_center, a.gap_xs]}>
+                            <CalendarDays
+                              width={tokens.space.lg}
+                              style={{
+                                color: t.atoms.text_contrast_medium.color,
+                              }}
+                            />
+                            <Text style={[t.atoms.text_contrast_medium]}>
+                              <Trans>Joined {dateJoined}</Trans>
+                            </Text>
+                          </View>
+                        ) : null}
                       </View>
-                    )}
-                  </View>
-                )}
+                    )
+                  }}
+                </AgField>
+              )}
             </View>
           )}
 

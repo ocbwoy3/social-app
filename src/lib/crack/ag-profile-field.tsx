@@ -81,6 +81,8 @@ type ProfileOverlayTarget = {
   banner?: string
   displayName?: string
   description?: string
+  pronouns?: string
+  website?: string
 }
 
 function isProfileOverlayTarget(value: unknown): value is ProfileOverlayTarget {
