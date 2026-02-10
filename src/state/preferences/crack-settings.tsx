@@ -64,12 +64,12 @@ export function Provider({children}: React.PropsWithChildren<{}>) {
     [setState],
   )
 
-  const queueRemoteSync = React.useCallback((_next: CrackSettings) => {}, [])
+  const queueRemoteSync = React.useCallback(() => {}, [])
 
   const set = React.useCallback(
     (next: CrackSettings) => {
       persistState(next)
-      queueRemoteSync(next)
+      queueRemoteSync()
     },
     [persistState, queueRemoteSync],
   )
@@ -82,7 +82,7 @@ export function Provider({children}: React.PropsWithChildren<{}>) {
         if (typeof next.kawaiiMode === 'boolean') {
           persisted.write('kawaii', next.kawaiiMode)
         }
-        queueRemoteSync(next)
+        queueRemoteSync()
         return next
       })
     },

@@ -12,10 +12,13 @@ import {useLingui} from '@lingui/react'
 
 import {useActorStatus} from '#/lib/actor-status'
 import {useHaptics} from '#/lib/haptics'
-import {useOpenLink} from '#/lib/hooks/useOpenLink'
 import {sanitizeDisplayName} from '#/lib/strings/display-names'
 import {sanitizeHandle} from '#/lib/strings/handles'
-import {definitelyUrl, toShortUrl} from '#/lib/strings/url-helpers'
+import {formatJoinDate} from '#/lib/strings/time'
+import {
+  sanitizeWebsiteForDisplay,
+  sanitizeWebsiteForLink,
+} from '#/lib/strings/website'
 import {logger} from '#/logger'
 import {type Shadow, useProfileShadow} from '#/state/cache/profile-shadow'
 import {
@@ -24,7 +27,7 @@ import {
 } from '#/state/queries/profile'
 import {useRequireAuth, useSession} from '#/state/session'
 import {ProfileMenu} from '#/view/com/profile/ProfileMenu'
-import {atoms as a, platform, useBreakpoints, useTheme} from '#/alf'
+import {atoms as a, platform, tokens, useBreakpoints, useTheme} from '#/alf'
 import {SubscribeProfileButton} from '#/components/activity-notifications/SubscribeProfileButton'
 import {Button, ButtonIcon, ButtonText} from '#/components/Button'
 import {AgField} from '#/components/crack/AgField'
@@ -32,13 +35,14 @@ import {DebugFieldDisplay} from '#/components/DebugFieldDisplay'
 import {useDialogControl} from '#/components/Dialog'
 import {MessageProfileButton} from '#/components/dms/MessageProfileButton'
 import {useRichText} from '#/components/hooks/useRichText'
-import {ChainLink_Stroke2_Corner0_Rounded as ChainLinkIcon} from '#/components/icons/ChainLink'
+import {CalendarDays_Stroke2_Corner0_Rounded as CalendarDays} from '#/components/icons/CalendarDays'
+import {Globe_Stroke2_Corner0_Rounded as Globe} from '#/components/icons/Globe'
 import {PlusLarge_Stroke2_Corner0_Rounded as Plus} from '#/components/icons/Plus'
 import {
   KnownFollowers,
   shouldShowKnownFollowers,
 } from '#/components/KnownFollowers'
-import {createStaticClick, InlineLinkText} from '#/components/Link'
+import {Link} from '#/components/Link'
 import * as Prompt from '#/components/Prompt'
 import {RichText} from '#/components/RichText'
 import * as Toast from '#/components/Toast'
@@ -78,13 +82,16 @@ let ProfileHeaderStandard = ({
   )
   const [, queueUnblock] = useProfileBlockMutationQueue(profile)
   const unblockPromptControl = Prompt.usePromptControl()
-  const openWebsitePromptControl = Prompt.usePromptControl()
-  const [websiteToOpen, setWebsiteToOpen] = useState('')
   const [showSuggestedFollows, setShowSuggestedFollows] = useState(false)
   const isBlockedUser =
     profile.viewer?.blocking ||
     profile.viewer?.blockedBy ||
     profile.viewer?.blockingByList
+
+  const dateJoined = useMemo(() => {
+    if (!profile.createdAt) return ''
+    return formatJoinDate(profile.createdAt)
+  }, [profile.createdAt])
 
   const unblockAccount = async () => {
     try {
@@ -101,7 +108,6 @@ let ProfileHeaderStandard = ({
   const isMe = currentAccount?.did === profile.did
 
   const {isActive: live} = useActorStatus(profile)
-  const openLink = useOpenLink()
 
   return (
     <>
@@ -209,32 +215,42 @@ let ProfileHeaderStandard = ({
                   value={profile.website ?? ''}
                   did={profile.did}>
                   {websiteValue => {
-                    const websiteUrl = websiteValue
-                      ? definitelyUrl(websiteValue)
-                      : null
-                    if (!websiteUrl) return null
-                    const websiteLabel = toShortUrl(websiteUrl)
+                    const websiteFormatted = sanitizeWebsiteForDisplay(
+                      websiteValue ?? '',
+                    )
+                    if (!websiteFormatted && !dateJoined) return null
+
                     return (
-                      <View style={[a.flex_row, a.align_center, a.gap_xs]}>
-                        <ChainLinkIcon
-                          size="sm"
-                          style={[t.atoms.text_contrast_medium]}
-                        />
-                        <InlineLinkText
-                          {...createStaticClick(() => {
-                            setWebsiteToOpen(websiteUrl)
-                            openWebsitePromptControl.open()
-                          })}
-                          label={_(msg`Open website`)}
-                          disableMismatchWarning
-                          numberOfLines={1}
-                          style={[
-                            a.text_md,
-                            a.leading_snug,
-                            t.atoms.text_contrast_medium,
-                          ]}>
-                          {websiteLabel}
-                        </InlineLinkText>
+                      <View
+                        style={[a.flex_row, a.flex_wrap, {gap: 10}, a.pt_md]}>
+                        {websiteFormatted ? (
+                          <Link
+                            to={sanitizeWebsiteForLink(websiteValue)}
+                            label={_(msg`Open website`)}
+                            style={[a.flex_row, a.align_center, a.gap_xs]}>
+                            <Globe
+                              width={tokens.space.lg}
+                              style={{color: t.palette.primary_500}}
+                            />
+                            <Text style={[{color: t.palette.primary_500}]}>
+                              {websiteFormatted}
+                            </Text>
+                          </Link>
+                        ) : null}
+
+                        {dateJoined ? (
+                          <View style={[a.flex_row, a.align_center, a.gap_xs]}>
+                            <CalendarDays
+                              width={tokens.space.lg}
+                              style={{
+                                color: t.atoms.text_contrast_medium.color,
+                              }}
+                            />
+                            <Text style={[t.atoms.text_contrast_medium]}>
+                              <Trans>Joined {dateJoined}</Trans>
+                            </Text>
+                          </View>
+                        ) : null}
                       </View>
                     )
                   }}
@@ -257,18 +273,6 @@ let ProfileHeaderStandard = ({
             profile.viewer?.blocking ? _(msg`Unblock`) : _(msg`Block`)
           }
           confirmButtonColor="negative"
-        />
-
-        <Prompt.Basic
-          control={openWebsitePromptControl}
-          title={_(msg`Open link?`)}
-          description={websiteToOpen || undefined}
-          confirmButtonCta={_(msg`Open link`)}
-          onConfirm={() => {
-            if (websiteToOpen) {
-              openLink(websiteToOpen)
-            }
-          }}
         />
       </ProfileHeaderShell>
 

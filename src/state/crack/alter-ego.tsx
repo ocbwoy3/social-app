@@ -294,6 +294,13 @@ export function useSetActiveAlterEgo() {
   const settings = useCrackSettings()
   const {update} = useCrackSettingsApi()
   return (did: string, uri: string | null, options?: {skipUri?: boolean}) => {
+    if (uri) {
+      const existingOverlay = settings.alterEgoRecords?.[uri]
+      if (existingOverlay) {
+        primeAlterEgoOverlay(existingOverlay)
+      }
+    }
+
     const nextByDid = {...(settings.alterEgoByDid ?? {})}
     if (uri) {
       nextByDid[did] = uri
