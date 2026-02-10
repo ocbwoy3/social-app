@@ -28,7 +28,6 @@ import {useSimpleVerificationState} from '#/components/verification'
 
 const DISPLAY_NAME_MAX_GRAPHEMES = 64
 const DESCRIPTION_MAX_GRAPHEMES = 256
-const PRONOUNS_MAX_GRAPHEMES = 20
 const WEBSITE_MAX_LENGTH = 300
 
 export function EditProfileDialog({
@@ -103,24 +102,24 @@ function DialogInner({
   const {_} = useLingui()
   const t = useTheme()
   const control = Dialog.useDialogContext()
-  const verification = useSimpleVerificationState({
-    profile,
-  })
+  const verification = useSimpleVerificationState({profile})
+
   const {
     mutateAsync: updateProfileMutation,
     error: updateProfileError,
     isError: isUpdateProfileError,
     isPending: isUpdatingProfile,
   } = useProfileUpdateMutation()
+
   const [imageError, setImageError] = useState('')
+
   const initialDisplayName = profile.displayName || ''
   const [displayName, setDisplayName] = useState(initialDisplayName)
   const initialDescription = profile.description || ''
   const [description, setDescription] = useState(initialDescription)
-  const initialPronouns = profile.pronouns || ''
-  const [pronouns, setPronouns] = useState(initialPronouns)
   const initialWebsite = profile.website || ''
   const [website, setWebsite] = useState(initialWebsite)
+
   const [userBanner, setUserBanner] = useState<string | undefined | null>(
     profile.banner,
   )
@@ -137,7 +136,6 @@ function DialogInner({
   const dirty =
     displayName !== initialDisplayName ||
     description !== initialDescription ||
-    pronouns !== initialPronouns ||
     website !== initialWebsite ||
     userAvatar !== profile.avatar ||
     userBanner !== profile.banner
@@ -185,7 +183,6 @@ function DialogInner({
   const onPressSave = useCallback(async () => {
     setImageError('')
     try {
-      const nextPronouns = pronouns.trim()
       const nextWebsiteRaw = website.trim()
       const nextWebsite = nextWebsiteRaw ? definitelyUrl(nextWebsiteRaw) : null
 
@@ -194,7 +191,6 @@ function DialogInner({
         updates: {
           displayName: displayName.trimEnd(),
           description: description.trimEnd(),
-          pronouns: nextPronouns || undefined,
           website: nextWebsite || undefined,
         },
         newUserAvatar,
@@ -212,7 +208,6 @@ function DialogInner({
     control,
     displayName,
     description,
-    pronouns,
     website,
     newUserAvatar,
     newUserBanner,
@@ -227,10 +222,6 @@ function DialogInner({
   const descriptionTooLong = isOverMaxGraphemeCount({
     text: description,
     maxCount: DESCRIPTION_MAX_GRAPHEMES,
-  })
-  const pronounsTooLong = isOverMaxGraphemeCount({
-    text: pronouns,
-    maxCount: PRONOUNS_MAX_GRAPHEMES,
   })
   const websiteTrimmed = website.trim()
   const websiteNormalized = websiteTrimmed
@@ -269,7 +260,6 @@ function DialogInner({
           isUpdatingProfile ||
           displayNameTooLong ||
           descriptionTooLong ||
-          pronounsTooLong ||
           websiteTooLong ||
           websiteInvalid
         }
@@ -292,7 +282,6 @@ function DialogInner({
       isUpdatingProfile,
       displayNameTooLong,
       descriptionTooLong,
-      pronounsTooLong,
       websiteTooLong,
       websiteInvalid,
     ],
@@ -332,6 +321,7 @@ function DialogInner({
           />
         </View>
       </View>
+
       {isUpdateProfileError && (
         <View style={[a.mt_xl]}>
           <ErrorMessage message={cleanError(updateProfileError)} />
@@ -342,6 +332,7 @@ function DialogInner({
           <ErrorMessage message={imageError} />
         </View>
       )}
+
       <View style={[a.mt_4xl, a.px_xl, a.gap_xl]}>
         <View>
           <TextField.LabelText>
@@ -418,35 +409,6 @@ function DialogInner({
               <Plural
                 value={DESCRIPTION_MAX_GRAPHEMES}
                 other="Description is too long. The maximum number of characters is #."
-              />
-            </Text>
-          )}
-        </View>
-
-        <View>
-          <TextField.LabelText>
-            <Trans>Pronouns</Trans>
-          </TextField.LabelText>
-          <TextField.Root isInvalid={pronounsTooLong}>
-            <Dialog.Input
-              defaultValue={pronouns}
-              onChangeText={setPronouns}
-              label={_(msg`Pronouns`)}
-              placeholder={_(msg`e.g. they/them`)}
-              testID="editProfilePronounsInput"
-            />
-          </TextField.Root>
-          {pronounsTooLong && (
-            <Text
-              style={[
-                a.text_sm,
-                a.mt_xs,
-                a.font_semi_bold,
-                {color: t.palette.negative_400},
-              ]}>
-              <Plural
-                value={PRONOUNS_MAX_GRAPHEMES}
-                other="Pronouns are too long. The maximum number of characters is #."
               />
             </Text>
           )}

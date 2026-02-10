@@ -21,6 +21,7 @@ export function ProfileHeaderHandle({
   const t = useTheme()
   const {_} = useLingui()
   const blockHide = profile.viewer?.blocking || profile.viewer?.blockedBy
+
   return (
     <View
       style={[a.flex_row, a.gap_sm, a.align_center, {maxWidth: '100%'}]}
@@ -34,55 +35,40 @@ export function ProfileHeaderHandle({
         </View>
       ) : undefined}
       <AgField field="handle" value={profile.handle} did={profile.did}>
-        {handleValue => (
-          <AgField
-            field="pronouns"
-            value={profile.pronouns ?? ''}
-            did={profile.did}>
-            {pronounsValue => {
-              const invalidHandle = isInvalidHandle(handleValue)
-              const hasPronouns = Boolean(pronounsValue && pronounsValue.trim())
-              return (
-                <Text
-                  emoji
-                  numberOfLines={1}
-                  style={[
-                    invalidHandle
-                      ? [
-                          a.border,
-                          a.text_xs,
-                          a.px_sm,
-                          a.py_xs,
-                          a.rounded_xs,
-                          {borderColor: t.palette.contrast_200},
-                        ]
-                      : [
-                          a.text_md,
-                          a.leading_snug,
-                          t.atoms.text_contrast_medium,
-                        ],
-                    web({
-                      wordBreak: 'break-all',
-                      direction: 'ltr',
-                      unicodeBidi: 'isolate',
-                    }),
-                  ]}>
-                  {invalidHandle
-                    ? _(msg`⚠Invalid Handle`)
-                    : sanitizeHandle(
-                        handleValue,
-                        '@',
-                        // forceLTR handled by CSS above on web
-                        IS_NATIVE,
-                      )}
-                  {!invalidHandle && hasPronouns
-                    ? ` (${pronounsValue.trim()})`
-                    : ''}
-                </Text>
-              )
-            }}
-          </AgField>
-        )}
+        {handleValue => {
+          const invalidHandle = isInvalidHandle(handleValue)
+          return (
+            <Text
+              emoji
+              numberOfLines={1}
+              style={[
+                invalidHandle
+                  ? [
+                      a.border,
+                      a.text_xs,
+                      a.px_sm,
+                      a.py_xs,
+                      a.rounded_xs,
+                      {borderColor: t.palette.contrast_200},
+                    ]
+                  : [a.text_md, a.leading_snug, t.atoms.text_contrast_medium],
+                web({
+                  wordBreak: 'break-all',
+                  direction: 'ltr',
+                  unicodeBidi: 'isolate',
+                }),
+              ]}>
+              {invalidHandle
+                ? _(msg`⚠Invalid Handle`)
+                : sanitizeHandle(
+                    handleValue,
+                    '@',
+                    // forceLTR handled by CSS above on web
+                    IS_NATIVE,
+                  )}
+            </Text>
+          )
+        }}
       </AgField>
     </View>
   )
