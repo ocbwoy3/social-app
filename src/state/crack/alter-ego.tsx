@@ -210,8 +210,6 @@ export async function fetchAlterEgoProfile({
     banner,
     displayName: record.displayName,
     description: record.description,
-    pronouns: record.pronouns,
-    website: record.website,
     handle: record.handle,
   }
 }
@@ -240,8 +238,6 @@ export function useAlterEgoProfileFields<T extends {did: string}>(
   banner?: string
   displayName?: string
   description?: string
-  pronouns?: string
-  website?: string
   handle?: string
 } {
   const alter = useActiveAlterEgo(profile.did)
@@ -253,8 +249,6 @@ export function useAlterEgoProfileFields<T extends {did: string}>(
       alter?.displayName ?? (profile as {displayName?: string}).displayName,
     description:
       alter?.description ?? (profile as {description?: string}).description,
-    pronouns: alter?.pronouns ?? (profile as {pronouns?: string}).pronouns,
-    website: alter?.website ?? (profile as {website?: string}).website,
     handle: alter?.handle ?? (profile as {handle?: string}).handle,
   }
 }
@@ -264,8 +258,6 @@ export function useAlterEgoProfileFieldsOfManyDids(dids: string[]): {
   banner?: string
   displayName?: string
   description?: string
-  pronouns?: string
-  website?: string
   handle?: string
 }[] {
   const settings = useCrackSettings()
@@ -282,8 +274,6 @@ export function useAlterEgoProfileFieldsOfManyDids(dids: string[]): {
         banner: overlay?.banner,
         displayName: overlay?.displayName,
         description: overlay?.description,
-        pronouns: overlay?.pronouns,
-        website: overlay?.website,
         handle: overlay?.handle,
       }
     })

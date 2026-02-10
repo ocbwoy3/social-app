@@ -39,18 +39,6 @@ lex.add({
             maxLength: 3000,
             description: 'New profile bio (e.g. [[#1 Rated Salesman1997]])',
           },
-          pronouns: {
-            type: 'string',
-            maxLength: 200,
-            maxGraphemes: 20,
-            description: 'Free-form pronouns text.',
-          },
-          website: {
-            type: 'string',
-            format: 'uri',
-            maxLength: 300,
-            description: 'A personal website URL.',
-          },
           displayName: {
             type: 'string',
             maxLength: 64,
@@ -72,8 +60,6 @@ export type AlterEgoRecord = {
   banner?: BlobRef
   handle?: string
   description?: string
-  pronouns?: string
-  website?: string
   displayName?: string
 }
 
@@ -83,8 +69,6 @@ export type AlterEgoProfileOverlay = {
   banner?: string
   handle?: string
   description?: string
-  pronouns?: string
-  website?: string
   displayName?: string
 }
 
@@ -121,8 +105,6 @@ export function applyAlterEgoProfile<
     banner?: string
     displayName?: string
     description?: string
-    pronouns?: string
-    website?: string
   },
 >(profile: T, overlay: AlterEgoProfileOverlay): T {
   return {
@@ -131,8 +113,6 @@ export function applyAlterEgoProfile<
     banner: overlay.banner ?? profile.banner,
     displayName: overlay.displayName ?? profile.displayName,
     description: overlay.description ?? profile.description,
-    pronouns: overlay.pronouns ?? profile.pronouns,
-    website: overlay.website ?? profile.website,
     handle: overlay.handle ?? profile.handle,
   }
 }

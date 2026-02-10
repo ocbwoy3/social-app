@@ -22,10 +22,6 @@ import {useOnboardingState} from '#/state/shell'
 import {ActivitySubscriptionsNUX} from '#/components/dialogs/nuxs/ActivitySubscriptions'
 import {BookmarksAnnouncement} from '#/components/dialogs/nuxs/BookmarksAnnouncement'
 import {
-  CrackPronounsBetaNuxDialog,
-  enabled as isCrackPronounsBetaNuxDialogEnabled,
-} from '#/components/dialogs/nuxs/crack/CrackPronounsBetaNuxDialog'
-import {
   DraftsAnnouncement,
   enabled as isDraftsAnnouncementEnabled,
 } from '#/components/dialogs/nuxs/DraftsAnnouncement'
@@ -56,10 +52,6 @@ const queuedNuxs: {
   {
     id: Nux.LiveNowBetaDialog,
     enabled: isLiveNowBetaDialogEnabled,
-  },
-  {
-    id: Nux.CrackPronounsBetaNuxDialog,
-    enabled: isCrackPronounsBetaNuxDialogEnabled,
   },
 ]
 
@@ -224,9 +216,6 @@ function Inner({
       {activeNux === Nux.ActivitySubscriptions && <ActivitySubscriptionsNUX />}
       {activeNux === Nux.LiveNowBetaDialog && <LiveNowBetaDialog />}
       {activeNux === Nux.DraftsAnnouncement && <DraftsAnnouncement />}
-      {activeNux === Nux.CrackPronounsBetaNuxDialog && (
-        <CrackPronounsBetaNuxDialog />
-      )}
     </Context.Provider>
   )
 }

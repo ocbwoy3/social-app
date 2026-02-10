@@ -86,12 +86,6 @@ lex.add({
                     description: {
                       type: 'string',
                     },
-                    pronouns: {
-                      type: 'string',
-                    },
-                    website: {
-                      type: 'string',
-                    },
                     displayName: {
                       type: 'string',
                     },
@@ -144,8 +138,6 @@ export type CrackSettingsPreference = {
       banner?: string
       handle?: string
       description?: string
-      pronouns?: string
-      website?: string
       displayName?: string
     }>
     statsigGateOverrides?: Array<{gate: string; value: boolean}>

@@ -143,8 +143,6 @@ const schema = z.object({
             banner: z.string().optional(),
             handle: z.string().optional(),
             description: z.string().optional(),
-            pronouns: z.string().optional(),
-            website: z.string().optional(),
             displayName: z.string().optional(),
           }),
         )
