@@ -8,6 +8,7 @@ Here's a list of features so far:
 Bluesky:
 
 - [x] Disable suggested follows
+- [x] Always show the Germ DM button
 - [x] Ability to bypass !hide on other user's content
 - [x] Disable feed composer prompt
 - [x] Alter Egos (client-side)
