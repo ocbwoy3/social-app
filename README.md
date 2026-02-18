@@ -3,13 +3,12 @@
 Welcome friends! This is the codebase for a fork of the Bluesky Social app -
 Bluesky on Crack.
 
-Here's a list of Crack features we so far...:
+### _**Third-party fork by [@kris.darkworld.download](https://bsky.app/profile/did:plc:s7cesz7cr6ybltaryy4meb6y).**_
 
-- [x] Pronouns & profile URLs
-- [x] Default to our own
-      [Castle Town PDS](https://castletown.darkworld.download)
+Here's a list of crack features, consolidated into each category:
 
-Bluesky:
+<details>
+<summary>Bluesky</summary>
 
 - [x] Disable suggested follows
 - [x] Rename posts to skeets
@@ -17,11 +16,16 @@ Bluesky:
 - [x] Always show the Germ DM button
 - [x] Ability to bypass !hide on other user's content
 - [x] Disable feed composer prompt
+- [x] Pronouns & profile URLs _(this is going to be an upstream feature soon,
+      the lexicon supports it)_
 - [x] Alter Egos
   - [x] Alter Ego editor
   - [x] Apply Alter Egos on other users
 
-ATProto:
+</details>
+
+<details>
+<summary>AT Protocol</summary>
 
 - [x] Remove labeler limit
 - [x] Disable AppLabelers
@@ -30,11 +34,22 @@ ATProto:
   - [x] Become a verifier
   - [x] Labeler trusted verifier negations
 
-Other:
+</details>
+
+<details>
+<summary>Other</summary>
 
 - [x] "Show NUX" option
 - [x] Feature gates editor
-- [x] Remove the New York Times
+- [x] Default to our own
+      [Castle Town PDS](https://castletown.darkworld.download)
+
+<img width="353" src="assets/images/initial_verification_announcement_2.png"/>
+
+BTW this works well as a PWA if you're on an iPhone like me with iOS 26 in the
+EU
+
+</details>
 
 ## Development Resources
 
