@@ -42,14 +42,14 @@ Here's a list of crack features, consolidated into each category:
 - [x] "Show NUX" option
 - [x] Feature gates editor
 - [x] Default to our own
-      [Castle Town PDS](https://castletown.darkworld.download)
+      [Castle Town PDS](https://castletown.darkworld.download) (definetly not a
+      deltarune reference)
 
 <img width="353" src="assets/images/initial_verification_announcement_2.png"/>
 
-BTW this works well as a PWA if you're on an iPhone like me with iOS 26 in the
-EU
-
 </details>
+
+Anyway, with my yapping out of the way...
 
 ## Development Resources
 
