@@ -45,7 +45,7 @@ Here's a list of crack features, consolidated into each category:
       [Castle Town PDS](https://castletown.darkworld.download) (definetly not a
       deltarune reference)
 
-<img width="353" src="assets/images/initial_verification_announcement_2.png"/>
+<img width="353" src="assets/images/initial_verification_announcement_2.png?"/>
 
 </details>
 
