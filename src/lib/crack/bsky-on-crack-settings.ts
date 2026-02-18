@@ -40,6 +40,9 @@ lex.add({
               hideSuggestedAccounts: {
                 type: 'boolean',
               },
+              renamePostsToSkeets: {
+                type: 'boolean',
+              },
               alterEgoEnabled: {
                 type: 'boolean',
               },
@@ -135,6 +138,7 @@ export type CrackSettingsPreference = {
     uncapLabelerLimit?: boolean
     hijackHideLabels?: boolean
     hideSuggestedAccounts?: boolean
+    renamePostsToSkeets?: boolean
     alterEgoEnabled?: boolean
     alterEgoUri?: string
     alterEgoByDid?: Array<{did: string; uri: string}>

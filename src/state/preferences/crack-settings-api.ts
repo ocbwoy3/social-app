@@ -12,6 +12,7 @@ export const crackSettingsDefaults: CrackSettings = {
   removeAppLabelers: false,
   hijackHideLabels: false,
   hideSuggestedAccounts: false,
+  renamePostsToSkeets: false,
   alwaysShowGermDmButton: false,
   alterEgoEnabled: true,
   disableInlineComposer: false,
@@ -104,6 +105,12 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         key: 'hideSuggestedAccounts',
         label: 'Hide suggested follows',
         description: 'Declutter profiles.',
+      },
+      {
+        type: 'toggle',
+        key: 'renamePostsToSkeets',
+        label: 'Rename posts to skeets',
+        description: 'Only affects English UI labels.',
       },
       {
         type: 'toggle',

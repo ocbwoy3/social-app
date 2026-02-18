@@ -1,9 +1,10 @@
 import {useEffect} from 'react'
 import {i18n} from '@lingui/core'
 
+import {applyPostNameReplacements} from '#/locale/crack/post-name-replacement'
 import {sanitizeAppLanguageSetting} from '#/locale/helpers'
 import {AppLanguage} from '#/locale/languages'
-import {useLanguagePrefs} from '#/state/preferences'
+import {useCrackSettings, useLanguagePrefs} from '#/state/preferences'
 
 /**
  * We do a dynamic import of just the catalog that we need
@@ -178,16 +179,18 @@ export async function dynamicActivate(locale: AppLanguage) {
     }
   }
 
-  i18n.load(locale, mod.messages)
+  i18n.load(locale, applyPostNameReplacements(mod.messages, locale))
   i18n.activate(locale)
 }
 
 export function useLocaleLanguage() {
   const {appLanguage} = useLanguagePrefs()
+  const {renamePostsToSkeets} = useCrackSettings()
+
   useEffect(() => {
     const sanitizedLanguage = sanitizeAppLanguageSetting(appLanguage)
 
     document.documentElement.lang = sanitizedLanguage
     dynamicActivate(sanitizedLanguage)
-  }, [appLanguage])
+  }, [appLanguage, renamePostsToSkeets])
 }
