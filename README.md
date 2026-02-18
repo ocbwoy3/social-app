@@ -3,7 +3,11 @@
 Welcome friends! This is the codebase for a fork of the Bluesky Social app -
 Bluesky on Crack.
 
-Here's a list of features so far:
+Here's a list of Crack features we so far...:
+
+- [x] Pronouns & profile URLs
+- [x] Default to our own
+      [Castle Town PDS](https://castletown.darkworld.download)
 
 Bluesky:
 
@@ -13,7 +17,7 @@ Bluesky:
 - [x] Always show the Germ DM button
 - [x] Ability to bypass !hide on other user's content
 - [x] Disable feed composer prompt
-- [x] Alter Egos (client-side)
+- [x] Alter Egos
   - [x] Alter Ego editor
   - [x] Apply Alter Egos on other users
 
