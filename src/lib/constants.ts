@@ -50,7 +50,7 @@ export function FEEDBACK_FORM_URL({
   let _str = BASE_FEEDBACK_FORM_URL
   let _email = email
   let _handle = handle
-  return 'https://tangled.org/ocbwoy3.dev/BlueskyOnCrack/issues'
+  return 'https://tangled.org/did:plc:s7cesz7cr6ybltaryy4meb6y/BlueskyOnCrack/issues'
 }
 
 export const MAX_DISPLAY_NAME = 64

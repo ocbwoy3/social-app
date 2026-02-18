@@ -3,22 +3,31 @@
 Welcome friends! This is the codebase for a fork of the Bluesky Social app -
 Bluesky on Crack.
 
-TODO:
+Here's a list of features so far:
 
-- [x] Crack settings API
-- [x] Constellation
-- [x] Custom verifications
+Bluesky:
+
+- [x] Disable suggested follows
+- [x] Ability to bypass !hide on other user's content
+- [x] Disable feed composer prompt
+- [x] Alter Egos (client-side)
+  - [x] Alter Ego editor
+  - [x] Apply Alter Egos on other users
+
+ATProto:
+
 - [x] Remove labeler limit
-- [x] Option to disable suggested friends
-- [x] "Alter Ego" feature (client-side custom profile details)
-- [x] Statsig gates editor
-      (`~/Developer/BlueskyOnCrack/src/lib/statsig/gates.ts`)
-- [x] Ability to turn off AppLabelers
-- [ ] Cancellations & Trusted Cancellers (opposite of verification)
-- [ ] Remove the New York Times
-- [ ] Add niche features
-- [ ] Add ability to edit posts
-- [ ] Restore backdated posts
+- [x] Disable AppLabelers
+- [x] Verification settings
+  - [x] Custom verifiers
+  - [x] Become a verifier
+  - [x] Labeler trusted verifier negations
+
+Other:
+
+- [x] "Show NUX" option
+- [x] Feature gates editor
+- [x] Remove the New York Times
 
 ## Development Resources
 

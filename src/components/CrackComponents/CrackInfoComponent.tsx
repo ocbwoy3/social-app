@@ -28,7 +28,7 @@ export function CrackCreditsInfo({
         </Text>
       )}
       <Text style={[a.text_sm, withThirdPartyNotice && {paddingBottom: 16}]}>
-        by @ocbwoy3.dev
+        by @kris.darkworld.download
       </Text>
       {withThirdPartyNotice && (
         <Text style={[a.text_center, t.atoms.text_contrast_low]}>

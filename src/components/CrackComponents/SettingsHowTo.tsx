@@ -71,8 +71,8 @@ function Inner({control}: {control: Dialog.DialogControlProps}) {
               a.italic,
             ]}>
             {/**
-             * Plz tell @ocbwoy3.dev to stop putting deltarune references everywhere PLEASE
-             * that guy has a serious problem
+             * Plz tell kris to stop putting deltarune references everywhere PLEASE!!!!
+             * wait.. is the alter ego name a deltarune reference too???
              */}
             <Trans>
               This app is basically just Bluesky, but on steroids. Ascend into
