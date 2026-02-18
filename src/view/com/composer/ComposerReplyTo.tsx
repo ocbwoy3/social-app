@@ -149,7 +149,7 @@ export function ComposerReplyTo({replyTo}: {replyTo: ComposerOptsPostRef}) {
           )}
         </View>
         {showFull && parsedQuoteEmbed && parsedQuoteEmbed.type === 'post' && (
-          <QuoteEmbed embed={parsedQuoteEmbed} />
+          <QuoteEmbed embed={parsedQuoteEmbed} linkDisabled />
         )}
       </View>
     </Pressable>

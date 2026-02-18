@@ -5,7 +5,6 @@ import {msg} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 import {useQueryClient} from '@tanstack/react-query'
 
-import {useActorStatus} from '#/lib/actor-status'
 import {makeProfileLink} from '#/lib/routes/links'
 import {forceLTR} from '#/lib/strings/bidi'
 import {NON_BREAKING_SPACE} from '#/lib/strings/constants'
@@ -14,7 +13,7 @@ import {sanitizeHandle} from '#/lib/strings/handles'
 import {sanitizePronouns} from '#/lib/strings/pronouns'
 import {niceDate} from '#/lib/strings/time'
 import {useProfileShadow} from '#/state/cache/profile-shadow'
-import {precacheProfile} from '#/state/queries/profile'
+import {unstableCacheProfileView} from '#/state/queries/profile'
 import {atoms as a, platform, useTheme, web} from '#/alf'
 import {AgField} from '#/components/crack/AgField'
 import {WebOnlyInlineLinkText} from '#/components/Link'
@@ -23,6 +22,7 @@ import {Text} from '#/components/Typography'
 import {useSimpleVerificationState} from '#/components/verification'
 import {VerificationCheck} from '#/components/verification/VerificationCheck'
 import {IS_ANDROID} from '#/env'
+import {useActorStatus} from '#/features/liveNow'
 import {TimeElapsed} from './TimeElapsed'
 import {PreviewableUserAvatar} from './UserAvatar'
 
@@ -31,6 +31,7 @@ interface PostMetaOpts {
   moderation: ModerationDecision | undefined
   postHref: string
   timestamp: string
+  linkDisabled?: boolean
   showAvatar?: boolean
   avatarSize?: number
   onOpenAuthor?: () => void
@@ -48,16 +49,18 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
   const queryClient = useQueryClient()
   const onOpenAuthor = opts.onOpenAuthor
   const onBeforePressAuthor = useCallback(() => {
-    precacheProfile(queryClient, author)
+    unstableCacheProfileView(queryClient, author)
     onOpenAuthor?.()
   }, [queryClient, author, onOpenAuthor])
   const onBeforePressPost = useCallback(() => {
-    precacheProfile(queryClient, author)
+    unstableCacheProfileView(queryClient, author)
   }, [queryClient, author])
 
   const timestampLabel = niceDate(i18n, opts.timestamp)
   const verification = useSimpleVerificationState({profile: author})
   const {isActive: live} = useActorStatus(author)
+
+  const MaybeLinkText = opts.linkDisabled ? Text : WebOnlyInlineLinkText
 
   return (
     <View
@@ -79,6 +82,7 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
             type={author.associated?.labeler ? 'labeler' : 'user'}
             live={live}
             hideLiveBadge
+            disableNavigation={opts.linkDisabled}
           />
         </View>
       )}
@@ -87,13 +91,13 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
           <View style={[a.flex_row, a.align_end, a.flex_shrink]}>
             <AgField field="displayName" value={displayName} did={author.did}>
               {alterDisplayName => (
-                <WebOnlyInlineLinkText
+                <MaybeLinkText
                   emoji
                   numberOfLines={1}
                   to={profileLink}
                   label={_(msg`View profile`)}
                   disableMismatchWarning
-                  onPress={onBeforePressAuthor}
+                  onPress={opts.linkDisabled ? undefined : onBeforePressAuthor}
                   style={[
                     a.text_md,
                     a.font_semi_bold,
@@ -108,7 +112,7 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
                       opts.moderation?.ui('displayName'),
                     ),
                   )}
-                </WebOnlyInlineLinkText>
+                </MaybeLinkText>
               )}
             </AgField>
             {verification.showBadge && (
@@ -137,14 +141,16 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
                   {pronounsValue => {
                     const pronouns = sanitizePronouns(pronounsValue, true)
                     return (
-                      <WebOnlyInlineLinkText
+                      <MaybeLinkText
                         emoji
                         numberOfLines={1}
                         to={profileLink}
                         label={_(msg`View profile`)}
                         disableMismatchWarning
                         disableUnderline
-                        onPress={onBeforePressAuthor}
+                        onPress={
+                          opts.linkDisabled ? undefined : onBeforePressAuthor
+                        }
                         style={[
                           a.text_md,
                           t.atoms.text_contrast_medium,
@@ -154,7 +160,7 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
                         {NON_BREAKING_SPACE +
                           sanitizeHandle(alterHandle, '@') +
                           (pronouns ? `${NON_BREAKING_SPACE}${pronouns}` : '')}
-                      </WebOnlyInlineLinkText>
+                      </MaybeLinkText>
                     )
                   }}
                 </AgField>
@@ -165,13 +171,13 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
 
         <TimeElapsed timestamp={opts.timestamp}>
           {({timeElapsed}) => (
-            <WebOnlyInlineLinkText
+            <MaybeLinkText
               to={opts.postHref}
               label={timestampLabel}
               title={timestampLabel}
               disableMismatchWarning
               disableUnderline
-              onPress={onBeforePressPost}
+              onPress={opts.linkDisabled ? undefined : onBeforePressPost}
               style={[
                 a.pl_xs,
                 a.text_md,
@@ -195,7 +201,7 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
                 </Text>
               )}
               {timeElapsed}
-            </WebOnlyInlineLinkText>
+            </MaybeLinkText>
           )}
         </TimeElapsed>
       </View>
