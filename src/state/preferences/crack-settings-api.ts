@@ -12,6 +12,7 @@ export const crackSettingsDefaults: CrackSettings = {
   removeAppLabelers: false,
   hijackHideLabels: false,
   hideSuggestedAccounts: false,
+  alwaysShowGermDmButton: false,
   alterEgoEnabled: true,
   disableInlineComposer: false,
   alterEgoUri: undefined,
@@ -104,6 +105,12 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         label: 'Hide suggested follows',
         description: 'Declutter profiles.',
       },
+      {
+        type: 'toggle',
+        key: 'alwaysShowGermDmButton',
+        label: 'Always show Germ DM',
+        description: 'Ignore the "Allow DMs from" option.',
+      },
 
       {
         type: 'toggle',
@@ -135,7 +142,7 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         type: 'toggle',
         key: 'uncapLabelerLimit',
         label: 'Remove labeler limit',
-        description: "Remove Bluesky's 20 labeler limit. Might break the app.",
+        description: 'Remove 20 labeler limit. Might break the app.',
       },
       {
         type: 'toggle',

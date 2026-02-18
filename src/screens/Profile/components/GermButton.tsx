@@ -11,6 +11,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query'
 
 import {until} from '#/lib/async/until'
 import {isNetworkError} from '#/lib/strings/errors'
+import {useCrackSettings} from '#/state/preferences'
 import {RQKEY} from '#/state/queries/profile'
 import {useAgent, useSession} from '#/state/session'
 import {atoms as a, useTheme, web} from '#/alf'
@@ -36,21 +37,26 @@ export function GermButton({
   const ax = useAnalytics()
   const {_} = useLingui()
   const {currentAccount} = useSession()
+  const {alwaysShowGermDmButton} = useCrackSettings()
   const linkWarningControl = Dialog.useDialogControl()
-
-  // exclude `none` and all unknown values
-  if (
-    !(germ.showButtonTo === 'everyone' || germ.showButtonTo === 'usersIFollow')
-  ) {
-    return null
-  }
 
   if (currentAccount?.did === profile.did) {
     return <GermSelfButton did={currentAccount.did} />
   }
 
-  if (germ.showButtonTo === 'usersIFollow' && !profile.viewer?.followedBy) {
-    return null
+  if (!alwaysShowGermDmButton) {
+    // exclude `none` and all unknown values
+    if (
+      !(
+        germ.showButtonTo === 'everyone' || germ.showButtonTo === 'usersIFollow'
+      )
+    ) {
+      return null
+    }
+
+    if (germ.showButtonTo === 'usersIFollow' && !profile.viewer?.followedBy) {
+      return null
+    }
   }
 
   const url = constructGermUrl(germ, profile, currentAccount?.did)
