@@ -57,7 +57,7 @@ RUN mkdir --parents $NVM_DIR && \
 COPY package.json yarn.lock ./
 COPY patches ./patches
 COPY scripts ./scripts
-COPY lingui.config.js ./
+COPY lingui.config.ts ./
 COPY src/locale ./src/locale
 COPY bskyweb/go.mod bskyweb/go.sum ./bskyweb/
 
