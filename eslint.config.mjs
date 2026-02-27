@@ -1,22 +1,27 @@
 // @ts-check
 import js from '@eslint/js'
-import tseslint from 'typescript-eslint'
-import { defineConfig } from 'eslint/config';
+import tsParser from '@typescript-eslint/parser'
+import bskyInternal from 'eslint-plugin-bsky-internal'
+import importPlugin from 'eslint-plugin-import'
+import lingui from 'eslint-plugin-lingui'
 import react from 'eslint-plugin-react'
+import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 // @ts-expect-error no types
 import reactNative from 'eslint-plugin-react-native'
 // @ts-expect-error no types
 import reactNativeA11y from 'eslint-plugin-react-native-a11y'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
-import importX from 'eslint-plugin-import-x'
-import lingui from 'eslint-plugin-lingui'
-import reactCompiler from 'eslint-plugin-react-compiler'
-import bskyInternal from 'eslint-plugin-bsky-internal'
 import globals from 'globals'
-import tsParser from '@typescript-eslint/parser'
+import tseslint from 'typescript-eslint'
 
-export default defineConfig(
+function trimGlobalKeys(globalSet) {
+  return Object.fromEntries(
+    Object.entries(globalSet).map(([key, value]) => [key.trim(), value]),
+  )
+}
+
+export default tseslint.config(
   /**
    * Global ignores
    */
@@ -45,11 +50,9 @@ export default defineConfig(
    */
   js.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
-  reactHooks.configs.flat.recommended,
-  // @ts-expect-error https://github.com/un-ts/eslint-plugin-import-x/issues/439
-  importX.flatConfigs.recommended,
-  importX.flatConfigs.typescript,
-  importX.flatConfigs['react-native'],
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  importPlugin.flatConfigs['react-native'],
 
   /**
    * Main configuration for all JS/TS/JSX/TSX files
@@ -58,6 +61,7 @@ export default defineConfig(
     files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       react,
+      'react-hooks': reactHooks,
       'react-native': reactNative,
       'react-native-a11y': reactNativeA11y,
       'simple-import-sort': simpleImportSort,
@@ -68,13 +72,13 @@ export default defineConfig(
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parser: tsParser,
       globals: {
-        ...globals.browser,
-        ...globals.node,
+        ...trimGlobalKeys(globals.browser),
+        ...trimGlobalKeys(globals.node),
       },
       parserOptions: {
-        parser: tsParser,
-        projectService: true,
+        project: true,
         tsconfigRootDir: import.meta.dirname,
         ecmaFeatures: {
           jsx: true,
@@ -126,16 +130,12 @@ export default defineConfig(
        */
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
+      ...reactHooks.configs.recommended.rules,
       'react/no-unescaped-entities': 'off',
       'react/prop-types': 'off',
       'react-native/no-inline-styles': 'off',
       ...reactNativeA11y.configs.all.rules,
       'react-compiler/react-compiler': 'warn',
-      // TODO: Fix these and set to error
-      'react-hooks/set-state-in-effect': 'warn',
-      'react-hooks/purity': 'warn',
-      'react-hooks/refs': 'warn',
-      'react-hooks/immutability': 'warn',
 
       /**
        * Import sorting
@@ -180,14 +180,9 @@ export default defineConfig(
       /**
        * Import linting
        */
-      'import-x/consistent-type-specifier-style': ['warn', 'prefer-inline'],
-      'import-x/no-unresolved': ['error', {
-        /*
-         * The `postinstall` hook runs `compile-if-needed` locally, but not in
-         * CI. For CI-sake, ignore this.
-         */
-        ignore: ['^#\/locale\/locales\/.+\/messages'],
-      }],
+      'import/namespace': 'off',
+      'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
+      'import/no-unresolved': 'off',
 
       /**
        * TypeScript-specific rules
@@ -264,7 +259,7 @@ export default defineConfig(
     files: ['**/__tests__/**/*.{js,jsx,ts,tsx}', '**/*.test.{js,jsx,ts,tsx}'],
     languageOptions: {
       globals: {
-        ...globals.jest,
+        ...trimGlobalKeys(globals.jest),
       }
     },
   },

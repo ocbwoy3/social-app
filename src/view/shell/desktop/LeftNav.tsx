@@ -273,12 +273,10 @@ function SwitchMenuItems({
           </>
         )}
         <SwitcherMenuProfileLink />
-        <Menu.Item
-          label={_(msg`Crack settings`)}
-          onPress={onCrackSettingsPress}>
+        <Menu.Item label={_(msg`TV Time`)} onPress={onCrackSettingsPress}>
           <Menu.ItemIcon icon={CodeBrackets} />
           <Menu.ItemText>
-            <Trans>Crack settings</Trans>
+            <Trans>TV Time</Trans>
           </Menu.ItemText>
         </Menu.Item>
         <Menu.Item

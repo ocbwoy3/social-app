@@ -100,8 +100,8 @@ export function DesktopRightNav({routeName}: {routeName: string}) {
         <InlineLinkText
           to="https://tangled.org/did:plc:s7cesz7cr6ybltaryy4meb6y/BlueskyOnCrack"
           style={[t.atoms.text_contrast_medium]}
-          label={_(msg`Bluesky on Crack`)}>
-          {_(msg`Bluesky on Crack`)} ({process.env.EXPO_PLATFORM ?? 'web'})
+          label={_(msg`TV Time`)}>
+          {_(msg`TV Time`)} ({process.env.EXPO_PLATFORM ?? 'web'})
         </InlineLinkText>
         <Text style={[t.atoms.text_contrast_low]}>{'\n'}</Text>
         {hasSession && (
@@ -140,13 +140,7 @@ export function DesktopRightNav({routeName}: {routeName: string}) {
         </InlineLinkText>
         <Text style={[t.atoms.text_contrast_medium, a.text_xs]}>{'\n\n'}</Text>
         <Text style={[t.atoms.text_contrast_medium, a.text_xs]}>
-          Third-party modification of Bluesky:{'\n'}
-        </Text>
-        <Text style={[t.atoms.text_contrast_medium, a.text_xs]}>
-          Not endorsed by Bluesky Social PBC,{'\n'}
-        </Text>
-        <Text style={[t.atoms.text_contrast_medium, a.text_xs]}>
-          Use at your own risk.
+          Unofficial, Bluesky fork
         </Text>
       </Text>
 

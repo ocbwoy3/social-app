@@ -14,7 +14,7 @@ export const router = new Router<AllNavigatableRoutes>({
   NotificationsActivityList: '/notifications/activity',
   LegacyNotificationSettings: '/notifications/settings',
   Settings: '/settings',
-  CrackSettings: '/settings/crack',
+  CrackSettings: '/settings/tv',
   CrackAlterEgoSettings: '/settings/crack/alter-ego',
   CrackVerificationSettings: '/settings/crack/verifications',
   Lists: '/lists',
