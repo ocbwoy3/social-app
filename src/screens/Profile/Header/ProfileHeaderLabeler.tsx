@@ -8,8 +8,9 @@ import {
   type ModerationOpts,
   type RichText as RichTextAPI,
 } from '@atproto/api'
-import {msg, Plural, plural, Trans} from '@lingui/macro'
+import {msg, plural} from '@lingui/core/macro'
 import {useLingui} from '@lingui/react'
+import {Plural, Trans} from '@lingui/react/macro'
 
 import {useHaptics} from '#/lib/haptics'
 import {isAppLabeler} from '#/lib/moderation'
@@ -394,7 +395,6 @@ export function HeaderLabelerButtons({
         </Button>
       ) : null}
       <ProfileMenu profile={profile} />
-
       <CantSubscribePrompt control={cantSubscribePrompt} />
     </>
   )

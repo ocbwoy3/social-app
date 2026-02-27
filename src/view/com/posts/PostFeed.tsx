@@ -15,7 +15,7 @@ import {
   AppBskyEmbedVideo,
   type AppBskyFeedDefs,
 } from '@atproto/api'
-import {msg} from '@lingui/macro'
+import {msg} from '@lingui/core/macro'
 import {useLingui} from '@lingui/react'
 import {useQueryClient} from '@tanstack/react-query'
 
@@ -683,6 +683,12 @@ let PostFeed = ({
     isCurrentFeedAtStartupSelected,
     blockedOrMutedAuthors,
   ])
+
+  useEffect(() => {
+    if (enabled === false) {
+      setIsPTRing(false)
+    }
+  }, [enabled])
 
   // events
   // =

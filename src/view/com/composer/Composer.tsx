@@ -52,8 +52,9 @@ import {
   type BskyAgent,
   type RichText,
 } from '@atproto/api'
-import {msg, plural, Trans} from '@lingui/macro'
+import {msg, plural} from '@lingui/core/macro'
 import {useLingui} from '@lingui/react'
+import {Trans} from '@lingui/react/macro'
 import {useNavigation} from '@react-navigation/native'
 import {useQueryClient} from '@tanstack/react-query'
 
@@ -133,7 +134,7 @@ import * as Prompt from '#/components/Prompt'
 import * as Toast from '#/components/Toast'
 import {Text} from '#/components/Typography'
 import {useAnalytics} from '#/analytics'
-import {IS_ANDROID, IS_IOS, IS_NATIVE, IS_WEB} from '#/env'
+import {IS_ANDROID, IS_IOS, IS_LIQUID_GLASS, IS_NATIVE, IS_WEB} from '#/env'
 import {BottomSheetPortalProvider} from '../../../../modules/bottom-sheet'
 import {
   draftToComposerPosts,
@@ -1525,7 +1526,13 @@ function ComposerTopBar({
     <Animated.View
       style={topBarAnimatedStyle}
       layout={native(LinearTransition)}>
-      <View style={styles.topbarInner}>
+      <View
+        style={[
+          a.flex_row,
+          a.align_center,
+          a.gap_xs,
+          IS_LIQUID_GLASS ? [a.px_lg, a.pt_lg, a.pb_md] : [a.p_sm],
+        ]}>
         <Button
           label={_(msg`Cancel`)}
           variant="ghost"
@@ -2141,10 +2148,15 @@ function useKeyboardVerticalOffset() {
     return bottom * -1
   }
 
+  // they ditched the gap behaviour on 26
+  if (IS_LIQUID_GLASS) {
+    return top
+  }
+
   // iPhone SE
   if (top === 20) return 40
 
-  // all other iPhones
+  // all other iPhones on <26
   return top + 10
 }
 
@@ -2189,13 +2201,6 @@ function useHideKeyboardOnBackground() {
 }
 
 const styles = StyleSheet.create({
-  topbarInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    height: 54,
-    gap: 4,
-  },
   postBtn: {
     borderRadius: 20,
     paddingHorizontal: 20,
