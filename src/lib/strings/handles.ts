@@ -26,12 +26,13 @@ export function isInvalidHandle(handle: string): boolean {
 }
 
 export function sanitizeHandle(
-  handle: string,
+  handle: string | null | undefined,
   prefix = '',
   forceLeftToRight = true,
 ): string {
-  const lowercasedWithPrefix = `${prefix}${handle.toLocaleLowerCase()}`
-  return isInvalidHandle(handle)
+  const safeHandle = handle ?? ''
+  const lowercasedWithPrefix = `${prefix}${safeHandle.toLocaleLowerCase()}`
+  return isInvalidHandle(safeHandle)
     ? '⚠Invalid Handle'
     : forceLeftToRight
       ? forceLTR(lowercasedWithPrefix)
