@@ -140,7 +140,7 @@ export function DesktopRightNav({routeName}: {routeName: string}) {
         </InlineLinkText>
         <Text style={[t.atoms.text_contrast_medium, a.text_xs]}>{'\n\n'}</Text>
         <Text style={[t.atoms.text_contrast_medium, a.text_xs]}>
-          Unofficial, Bluesky fork
+          Unofficial Bluesky fork
         </Text>
       </Text>
 
