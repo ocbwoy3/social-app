@@ -87,7 +87,7 @@ export const SplashScreen = ({
           ]}>
           <ErrorBoundary>
             <View style={[a.justify_center, a.align_center]}>
-              <Logo width={kawaii ? 300 : 92} fill="sky" />
+              <Logo width={300} fill="sky" />
 
               {!kawaii && (
                 <View style={[a.pb_sm, a.pt_5xl]}>
@@ -101,7 +101,7 @@ export const SplashScreen = ({
                   a.font_semi_bold,
                   t.atoms.text_contrast_medium,
                 ]}>
-                <Trans>What's up?</Trans>
+                <Trans>Need ATProto!?</Trans>
               </Text>
             </View>
 

@@ -1,6 +1,7 @@
 import {View} from 'react-native'
 
 import {Logo} from '#/view/icons/Logo'
+import {Logotype} from '#/view/icons/Logotype'
 import {atoms as a, useTheme} from '#/alf'
 import {Text} from '../Typography'
 
@@ -19,8 +20,9 @@ export function CrackCreditsInfo({
         paddingVertical: 16,
         gap: withThirdPartyNotice ? 4 : 0,
       }}>
-      <Logo width={96} style={[{paddingBottom: 16}]} />
-      <Text style={[a.text_3xl]}>It's TV Time!</Text>
+      <Logo width={128} style={[{paddingBottom: 16}]} />
+      {/* <Text style={[a.text_3xl]}>It's TV Time!</Text> */}
+      <Logotype width={128} />
       <Text style={[a.text_sm, withThirdPartyNotice && {paddingBottom: 16}]}>
         the fun gang is watching...
       </Text>

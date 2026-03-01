@@ -200,7 +200,7 @@ export function ComposerPrompt() {
             a.text_md,
             {includeFontPadding: false},
           ]}>
-          <Trans>What's up?</Trans>
+          <Trans>Is it TV Time yet?</Trans>
         </Text>
         <View style={[a.flex_row, a.gap_md]}>
           {IS_NATIVE && (

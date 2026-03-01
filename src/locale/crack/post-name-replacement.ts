@@ -17,9 +17,13 @@ function replaceInValue(value: unknown): unknown {
   }
 
   if (Array.isArray(value)) {
-    // Lingui variable placeholders are encoded as single-item arrays
-    // (e.g. ["reposter"]). Do not replace inside them.
-    if (value.length === 1 && typeof value[0] === 'string') {
+    // Lingui placeholders are encoded as single-item arrays
+    // (e.g. ["reposter"] or ["0"]). Do not replace inside them.
+    if (
+      value.length === 1 &&
+      typeof value[0] === 'string' &&
+      (/^\d+$/.test(value[0]) || /^[a-z][a-zA-Z0-9_]*$/.test(value[0]))
+    ) {
       return value
     }
 
