@@ -17,6 +17,12 @@ function replaceInValue(value: unknown): unknown {
   }
 
   if (Array.isArray(value)) {
+    // Lingui variable placeholders are encoded as single-item arrays
+    // (e.g. ["reposter"]). Do not replace inside them.
+    if (value.length === 1 && typeof value[0] === 'string') {
+      return value
+    }
+
     return value.map(replaceInValue)
   }
 
