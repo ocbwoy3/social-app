@@ -103,6 +103,38 @@ export function parseAlterEgoUri(uri: string): {
   }
 }
 
+export function getAlterEgoDisplayLabel(
+  overlay: Pick<
+    AlterEgoProfileOverlay,
+    'uri' | 'displayName' | 'handle' | 'description' | 'pronouns' | 'website'
+  >,
+) {
+  const displayName = overlay.displayName?.trim()
+  if (displayName) {
+    return displayName
+  }
+
+  const handle = overlay.handle?.trim()
+  if (handle) {
+    return handle
+  }
+
+  const hasMetadata = Boolean(
+    overlay.description?.trim() ||
+      overlay.pronouns?.trim() ||
+      overlay.website?.trim(),
+  )
+
+  if (hasMetadata) {
+    const parsed = parseAlterEgoUri(overlay.uri)
+    if (parsed?.rkey) {
+      return parsed.rkey
+    }
+  }
+
+  return parseAlterEgoUri(overlay.uri)?.rkey || overlay.uri
+}
+
 export function validateAlterEgoRecord(
   record: unknown,
 ): record is AlterEgoRecord {

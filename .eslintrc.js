@@ -7,9 +7,7 @@ module.exports = {
     'plugin:react-native-a11y/ios',
     'prettier',
   ],
-  parser: '@typescript-eslint/parser',
   plugins: [
-    '@typescript-eslint',
     'react',
     'lingui',
     'simple-import-sort',
@@ -88,17 +86,27 @@ module.exports = {
     'simple-import-sort/exports': 'error',
     'react-compiler/react-compiler': 'warn',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {argsIgnorePattern: '^_', varsIgnorePattern: '^_.+'},
-    ],
-    '@typescript-eslint/consistent-type-imports': [
-      'warn',
-      {prefer: 'type-imports', fixStyle: 'inline-type-imports'},
-    ],
-    'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      plugins: ['@typescript-eslint'],
+      rules: {
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {argsIgnorePattern: '^_', varsIgnorePattern: '^_.+'},
+        ],
+        '@typescript-eslint/consistent-type-imports': [
+          'warn',
+          {prefer: 'type-imports', fixStyle: 'inline-type-imports'},
+        ],
+        '@typescript-eslint/no-duplicate-enum-values': 'off',
+        'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
+      },
+    },
+  ],
   ignorePatterns: [
+    '.eslintrc.js',
     '**/__mocks__/*.ts',
     'src/platform/polyfills.ts',
     'src/third-party',

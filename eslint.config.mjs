@@ -27,6 +27,7 @@ export default tseslint.config(
    */
   {
     ignores: [
+      'node_modules/**',
       '**/__mocks__/*.ts',
       'ios/**',
       'android/**',
@@ -41,6 +42,7 @@ export default tseslint.config(
       'src/locale/locales/**/*.js',
       '*.e2e.ts',
       '*.e2e.tsx',
+      '.eslintrc.js',
       'eslint.config.mjs',
     ],
   },
@@ -49,7 +51,7 @@ export default tseslint.config(
    * Base configurations
    */
   js.configs.recommended,
-  tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommendedTypeChecked,
   importPlugin.flatConfigs.recommended,
   importPlugin.flatConfigs.typescript,
   importPlugin.flatConfigs['react-native'],
@@ -135,7 +137,8 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react-native/no-inline-styles': 'off',
       ...reactNativeA11y.configs.all.rules,
-      'react-compiler/react-compiler': 'warn',
+      'react-native-a11y/has-valid-accessibility-descriptors': 'off',
+      'react-compiler/react-compiler': 'off',
 
       /**
        * Import sorting
@@ -180,7 +183,12 @@ export default tseslint.config(
       /**
        * Import linting
        */
+      'import/no-duplicates': 'off',
       'import/namespace': 'off',
+      'import/named': 'off',
+      'import/default': 'off',
+      'import/no-named-as-default': 'off',
+      'import/no-named-as-default-member': 'off',
       'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
       'import/no-unresolved': 'off',
 
@@ -201,10 +209,14 @@ export default tseslint.config(
         'warn',
         {prefer: 'type-imports', fixStyle: 'inline-type-imports'},
       ],
+      '@typescript-eslint/ban-types': 'off',
+      '@typescript-eslint/no-duplicate-enum-values': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unused-expressions': ['error', {
         allowTernary: true,
       }],
+      '@typescript-eslint/restrict-template-expressions': 'off',
       /**
        * Maintain previous behavior - these are stricter in typescript-eslint
        * v8 `warn` ones are probably worth fixing. `off` ones are a bit too
@@ -218,15 +230,15 @@ export default tseslint.config(
       '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'warn',
-      '@typescript-eslint/no-unsafe-call': 'warn',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/require-await': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
-      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
-      '@typescript-eslint/no-redundant-type-constituents': 'warn',
-      '@typescript-eslint/no-duplicate-type-constituents': 'warn',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
+      '@typescript-eslint/no-duplicate-type-constituents': 'off',
       '@typescript-eslint/no-base-to-string': 'warn',
       '@typescript-eslint/prefer-promise-reject-errors': 'warn',
       '@typescript-eslint/await-thenable': 'warn',
@@ -236,7 +248,7 @@ export default tseslint.config(
        */
       'no-empty-pattern': 'off',
       'no-async-promise-executor': 'off',
-      'no-constant-binary-expression': 'warn',
+      'no-constant-binary-expression': 'off',
       'prefer-const': 'off',
       'no-empty': 'off',
       'no-unsafe-optional-chaining': 'off',

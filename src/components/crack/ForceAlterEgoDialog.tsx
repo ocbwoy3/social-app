@@ -3,6 +3,7 @@ import {View} from 'react-native'
 import {msg, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
+import {getAlterEgoDisplayLabel} from '#/lib/crack/alter-ego'
 import {useSetActiveAlterEgo} from '#/state/crack/alter-ego'
 import {useCrackSettings} from '#/state/preferences'
 import * as Toast from '#/view/com/util/Toast'
@@ -60,7 +61,7 @@ export function ForceAlterEgoDialog({
             </Text>
           </View>
 
-          {activeRecord && (
+          {activeUri && (
             <View
               style={[
                 a.rounded_md,
@@ -87,11 +88,11 @@ export function ForceAlterEgoDialog({
                   />
                   <View style={[a.flex_1]}>
                     <Text style={[a.text_md, a.font_semi_bold]}>
-                      {activeRecord.displayName ||
-                        activeRecord.handle ||
-                        activeUri}
+                      {activeRecord
+                        ? getAlterEgoDisplayLabel(activeRecord)
+                        : activeUri}
                     </Text>
-                    {activeRecord.handle && (
+                    {activeRecord?.handle && (
                       <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>
                         @{activeRecord.handle}
                       </Text>
@@ -159,7 +160,7 @@ export function ForceAlterEgoDialog({
                         />
                         <View style={[a.flex_1]}>
                           <Text style={[a.text_md, a.font_semi_bold]}>
-                            {record.displayName || record.handle || record.uri}
+                            {getAlterEgoDisplayLabel(record)}
                           </Text>
                           {record.handle && (
                             <Text
@@ -171,20 +172,19 @@ export function ForceAlterEgoDialog({
                       </View>
                       <Button
                         variant="solid"
-                        color="primary"
+                        color={isActive ? 'secondary' : 'primary'}
                         size="small"
                         label={
-                          isActive ? _(msg`Active`) : _(msg`Use this Alter Ego`)
+                          isActive
+                            ? _(msg`Unset alter ego`)
+                            : _(msg`Use this Alter Ego`)
                         }
-                        disabled={isActive}
-                        onPress={() => handleApply(record.uri)}>
+                        onPress={() =>
+                          isActive ? handleClear() : handleApply(record.uri)
+                        }>
                         <ButtonIcon icon={SparkleIcon} />
                         <ButtonText>
-                          {isActive ? (
-                            <Trans>Active</Trans>
-                          ) : (
-                            <Trans>Use</Trans>
-                          )}
+                          {isActive ? <Trans>Unset</Trans> : <Trans>Use</Trans>}
                         </ButtonText>
                       </Button>
                     </View>

@@ -48,7 +48,7 @@
     "test-watch": "NODE_ENV=test jest --watchAll",
     "test-ci": "NODE_ENV=test jest --ci --forceExit --reporters=default --reporters=jest-junit",
     "test-coverage": "NODE_ENV=test jest --coverage",
-    "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx src",
+    "lint": "eslint --cache src",
     "lint-native": "swiftlint ./modules && ktlint ./modules",
     "lint-native:fix": "swiftlint --fix ./modules && ktlint --format ./modules",
     "typecheck": "tsc --project ./tsconfig.check.json",
@@ -284,7 +284,7 @@
     "svgo": "^3.3.2",
     "ts-plugin-sort-import-suggestions": "^1.0.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.0",
+    "typescript-eslint": "^7.18.0",
     "webpack-bundle-analyzer": "^4.10.1"
   },
   "resolutions": {

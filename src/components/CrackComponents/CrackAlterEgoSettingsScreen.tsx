@@ -4,7 +4,7 @@ import {msg, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 import {type NativeStackScreenProps} from '@react-navigation/native-stack'
 
-import {parseAlterEgoUri} from '#/lib/crack/alter-ego'
+import {getAlterEgoDisplayLabel, parseAlterEgoUri} from '#/lib/crack/alter-ego'
 import {type CommonNavigatorParams} from '#/lib/routes/types'
 import {logger} from '#/logger'
 import {
@@ -301,9 +301,7 @@ export function CrackAlterEgoSettingsScreen({}: Props) {
                           />
                           <View style={[a.flex_1]}>
                             <Text style={[a.text_sm, a.font_semi_bold]}>
-                              {record.displayName ||
-                                record.handle ||
-                                record.uri}
+                              {getAlterEgoDisplayLabel(record)}
                             </Text>
                             {record.handle && (
                               <Text
@@ -333,26 +331,30 @@ export function CrackAlterEgoSettingsScreen({}: Props) {
                           </Button>
                           <Button
                             variant="solid"
-                            color="primary"
+                            color={isActive ? 'secondary' : 'primary'}
                             size="tiny"
                             shape="rectangular"
                             label={
-                              isActive ? _(msg`Active`) : _(msg`Use alter ego`)
+                              isActive
+                                ? _(msg`Unset alter ego`)
+                                : _(msg`Use alter ego`)
                             }
                             disabled={
-                              !recordDid ||
-                              isSaving ||
-                              isActive ||
-                              !alterEgoEnabled
+                              !recordDid || isSaving || !alterEgoEnabled
                             }
                             onPress={() => {
                               if (!recordDid) return
-                              setActiveAlterEgo(recordDid, record.uri)
-                              Toast.show(_(msg`Alter ego applied.`))
+                              if (isActive) {
+                                setActiveAlterEgo(recordDid, null)
+                                Toast.show(_(msg`Alter ego cleared.`))
+                              } else {
+                                setActiveAlterEgo(recordDid, record.uri)
+                                Toast.show(_(msg`Alter ego applied.`))
+                              }
                             }}>
                             <ButtonIcon icon={CheckIcon} />
                             <ButtonText>
-                              {isActive ? _(msg`Active`) : _(msg`Apply`)}
+                              {isActive ? _(msg`Unset`) : _(msg`Apply`)}
                             </ButtonText>
                           </Button>
                         </View>

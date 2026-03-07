@@ -1,9 +1,9 @@
 import {useState} from 'react'
-import {LogBox, Pressable, View, TextInput} from 'react-native'
+import {LogBox, Pressable, TextInput, View} from 'react-native'
 import {useQueryClient} from '@tanstack/react-query'
 
 import {BLUESKY_PROXY_HEADER} from '#/lib/constants'
-import {useSessionApi, useAgent} from '#/state/session'
+import {useAgent, useSessionApi} from '#/state/session'
 import {useLoggedOutViewControls} from '#/state/shell/logged-out'
 import {useOnboardingDispatch} from '#/state/shell/onboarding'
 import {navigate} from '../../../Navigation'

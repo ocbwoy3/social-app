@@ -13,6 +13,7 @@ export const crackSettingsDefaults: CrackSettings = {
   hijackHideLabels: false,
   hideSuggestedAccounts: false,
   renamePostsToSkeets: false,
+  expandProfileMetrics: false,
   alwaysShowGermDmButton: false,
   alterEgoEnabled: true,
   disableInlineComposer: false,
@@ -111,6 +112,12 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         key: 'renamePostsToSkeets',
         label: 'Rename posts to skeets',
         description: 'Only affects English UI labels.',
+      },
+      {
+        type: 'toggle',
+        key: 'expandProfileMetrics',
+        label: 'Expand profile metrics',
+        description: 'Show full counts like 1,284 instead of 1.2K.',
       },
       {
         type: 'toggle',

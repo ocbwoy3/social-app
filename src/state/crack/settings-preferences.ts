@@ -24,6 +24,7 @@ export function createCrackSettingsPreference(
       hijackHideLabels: settings.hijackHideLabels,
       hideSuggestedAccounts: settings.hideSuggestedAccounts,
       renamePostsToSkeets: settings.renamePostsToSkeets,
+      expandProfileMetrics: settings.expandProfileMetrics,
       alterEgoEnabled: settings.alterEgoEnabled,
       alterEgoUri: settings.alterEgoUri,
       alterEgoByDid: Object.entries(settings.alterEgoByDid ?? {}).map(
@@ -77,6 +78,8 @@ export function mergeCrackSettingsPreference(
       prefSettings.hideSuggestedAccounts ?? settings.hideSuggestedAccounts,
     renamePostsToSkeets:
       prefSettings.renamePostsToSkeets ?? settings.renamePostsToSkeets,
+    expandProfileMetrics:
+      prefSettings.expandProfileMetrics ?? settings.expandProfileMetrics,
     alterEgoEnabled: prefSettings.alterEgoEnabled ?? settings.alterEgoEnabled,
     alterEgoUri: prefSettings.alterEgoUri ?? settings.alterEgoUri,
     alterEgoByDid,

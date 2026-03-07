@@ -43,6 +43,9 @@ lex.add({
               renamePostsToSkeets: {
                 type: 'boolean',
               },
+              expandProfileMetrics: {
+                type: 'boolean',
+              },
               alterEgoEnabled: {
                 type: 'boolean',
               },
@@ -125,8 +128,7 @@ lex.add({
   lexicon: 1,
 })
 
-export const CRACK_SETTINGS_PREF_TYPE =
-  'dev.ocbwoy3.crack#bskyOnCrackSettings' as const
+export const CRACK_SETTINGS_PREF_TYPE = 'dev.ocbwoy3.crack#bskyOnCrackSettings'
 
 export type CrackSettingsPreference = {
   $type: typeof CRACK_SETTINGS_PREF_TYPE
@@ -139,6 +141,7 @@ export type CrackSettingsPreference = {
     hijackHideLabels?: boolean
     hideSuggestedAccounts?: boolean
     renamePostsToSkeets?: boolean
+    expandProfileMetrics?: boolean
     alterEgoEnabled?: boolean
     alterEgoUri?: string
     alterEgoByDid?: Array<{did: string; uri: string}>
