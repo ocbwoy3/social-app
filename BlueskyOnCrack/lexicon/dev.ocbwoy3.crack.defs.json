@@ -1,0 +1,119 @@
+{
+  "id": "dev.ocbwoy3.crack.defs",
+  "defs": {
+    "bskyOnCrackSettings": {
+      "type": "object",
+      "description": "Private preferences for Bluesky on Crack.",
+      "required": [
+        "version",
+        "settings"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "kawaiiMode": {
+              "type": "boolean"
+            },
+            "showWelcomeModal": {
+              "type": "boolean"
+            },
+            "customVerificationsEnabled": {
+              "type": "boolean"
+            },
+            "uncapLabelerLimit": {
+              "type": "boolean"
+            },
+            "hijackHideLabels": {
+              "type": "boolean"
+            },
+            "hideSuggestedAccounts": {
+              "type": "boolean"
+            },
+            "alterEgoEnabled": {
+              "type": "boolean"
+            },
+            "alterEgoUri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "alterEgoByDid": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "did",
+                  "uri"
+                ],
+                "properties": {
+                  "did": {
+                    "type": "string",
+                    "format": "did"
+                  },
+                  "uri": {
+                    "type": "string",
+                    "format": "at-uri"
+                  }
+                }
+              }
+            },
+            "alterEgoRecords": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "uri"
+                ],
+                "properties": {
+                  "uri": {
+                    "type": "string",
+                    "format": "at-uri"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "banner": {
+                    "type": "string"
+                  },
+                  "handle": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "statsigGateOverrides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "gate",
+                  "value"
+                ],
+                "properties": {
+                  "gate": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}
