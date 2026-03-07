@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  bskyweb:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EXPO_PUBLIC_ENV: production
+        EXPO_PUBLIC_RELEASE_VERSION: local
+        EXPO_PUBLIC_BUNDLE_IDENTIFIER: local
+    command: ["bskyweb", "serve", "--robots-disallow-all"]
+    ports:
+      - "8100:8100"
+    environment:
+      ATP_APPVIEW_HOST: "https://public.api.bsky.app"
+      # HTTP_ADDRESS: ":8100"
+      ROBOTS_DISALLOW_ALL: "true"
