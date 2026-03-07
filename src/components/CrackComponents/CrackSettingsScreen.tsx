@@ -55,13 +55,6 @@ import {ShieldCheck_Stroke2_Corner0_Rounded as ShieldIcon} from '../icons/Shield
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'CrackSettings'>
 
-const sectionIcons: Record<string, ComponentType<SVGIconProps>> = {
-  bluesky: SparkleIcon,
-  verification: CircleCheckIcon,
-  atproto: FilterIcon,
-  nux: WindowIcon,
-}
-
 export function CrackSettingsScreen({}: Props) {
   const t = useTheme()
   const {gtMobile} = useBreakpoints()
@@ -153,7 +146,7 @@ export function CrackSettingsScreen({}: Props) {
                           />
                         ) : (
                           <ActionRow
-                            icon={sectionIcons[section.id] ?? WindowIcon}
+                            icon={getItemIcon(item)}
                             title={item.label}
                             description={item.description}
                             onPress={() => onPressButton(item)}

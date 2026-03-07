@@ -91,9 +91,30 @@ export const LABELER_NEG_VERIFIERS: {[did: string]: string[]} = {
 
 export const crackSettingsSections: CrackSettingsSection[] = [
   {
-    id: 'bluesky',
-    title: 'Bluesky',
-    description: 'All the cool stuff.',
+    id: 'tools',
+    title: 'Tools',
+    description: 'Feature-specific tools and editors.',
+    items: [
+      {
+        type: 'button',
+        id: 'openVerificationSettings',
+        label: 'Verification settings',
+        description: 'Manage trusted verifiers and negations.',
+        buttonLabel: 'Manage',
+      },
+      {
+        type: 'button',
+        id: 'openAlterEgo',
+        label: 'Alter ego',
+        description: 'Overlay a profile on top.',
+        buttonLabel: 'Configure',
+      },
+    ],
+  },
+  {
+    id: 'appearance',
+    title: 'Appearance',
+    description: 'Small visual tweaks.',
     items: [
       {
         type: 'toggle',
@@ -103,15 +124,22 @@ export const crackSettingsSections: CrackSettingsSection[] = [
       },
       {
         type: 'toggle',
-        key: 'hideSuggestedAccounts',
-        label: 'Hide suggested follows',
-        description: 'Declutter profiles.',
-      },
-      {
-        type: 'toggle',
         key: 'renamePostsToSkeets',
         label: 'Rename posts to skeets',
         description: 'Only affects English UI labels.',
+      },
+    ],
+  },
+  {
+    id: 'profiles',
+    title: 'Profiles',
+    description: 'Profile and messaging tweaks.',
+    items: [
+      {
+        type: 'toggle',
+        key: 'hideSuggestedAccounts',
+        label: 'Hide suggested follows',
+        description: 'Declutter profiles.',
       },
       {
         type: 'toggle',
@@ -125,33 +153,32 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         label: 'Always show Germ DM',
         description: 'Ignore the "Allow DMs from" option.',
       },
-
-      {
-        type: 'toggle',
-        key: 'hijackHideLabels',
-        label: 'Bypass !hide',
-        description: 'Lets you view hidden users and lists.',
-      },
+    ],
+  },
+  {
+    id: 'feed',
+    title: 'Feed',
+    description: 'Timeline cleanup.',
+    items: [
       {
         type: 'toggle',
         key: 'disableInlineComposer',
         label: 'Disable composer prompt',
         description: 'Declutter home.',
       },
-      {
-        type: 'button',
-        id: 'openAlterEgo',
-        label: 'Alter ego',
-        description: 'Overlay a profile on top.',
-        buttonLabel: 'Configure',
-      },
     ],
   },
   {
-    id: 'atproto',
-    title: 'AT Protocol',
-    description: 'Highly technical, I know.',
+    id: 'advanced',
+    title: 'Advanced',
+    description: 'Power-user and protocol overrides.',
     items: [
+      {
+        type: 'toggle',
+        key: 'hijackHideLabels',
+        label: 'Bypass !hide',
+        description: 'Lets you view hidden users and lists.',
+      },
       {
         type: 'toggle',
         key: 'uncapLabelerLimit',
@@ -163,13 +190,6 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         key: 'removeAppLabelers',
         label: 'Unsubscribe from Bluesky Moderation',
         description: 'Disables AppLabelers on next app restart.',
-      },
-      {
-        type: 'button',
-        id: 'openVerificationSettings',
-        label: 'Verification settings',
-        description: 'Manage trusted verifiers and negations.',
-        buttonLabel: 'Manage',
       },
     ],
   },
