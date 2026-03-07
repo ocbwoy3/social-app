@@ -1,0 +1,278 @@
+// @ts-check
+import js from '@eslint/js'
+import tsParser from '@typescript-eslint/parser'
+import bskyInternal from 'eslint-plugin-bsky-internal'
+import importPlugin from 'eslint-plugin-import'
+import lingui from 'eslint-plugin-lingui'
+import react from 'eslint-plugin-react'
+import reactCompiler from 'eslint-plugin-react-compiler'
+import reactHooks from 'eslint-plugin-react-hooks'
+// @ts-expect-error no types
+import reactNative from 'eslint-plugin-react-native'
+// @ts-expect-error no types
+import reactNativeA11y from 'eslint-plugin-react-native-a11y'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
+
+function trimGlobalKeys(globalSet) {
+  return Object.fromEntries(
+    Object.entries(globalSet).map(([key, value]) => [key.trim(), value]),
+  )
+}
+
+export default tseslint.config(
+  /**
+   * Global ignores
+   */
+  {
+    ignores: [
+      'node_modules/**',
+      '**/__mocks__/*.ts',
+      'ios/**',
+      'android/**',
+      'coverage/**',
+      '*.lock',
+      '.husky/**',
+      'patches/**',
+      '*.html',
+      'bskyweb/**',
+      'bskyembed/**',
+      'src/locale/locales/_build/**',
+      'src/locale/locales/**/*.js',
+      '*.e2e.ts',
+      '*.e2e.tsx',
+      '.eslintrc.js',
+      'eslint.config.mjs',
+    ],
+  },
+
+  /**
+   * Base configurations
+   */
+  js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  importPlugin.flatConfigs['react-native'],
+
+  /**
+   * Main configuration for all JS/TS/JSX/TSX files
+   */
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      'react-native': reactNative,
+      'react-native-a11y': reactNativeA11y,
+      'simple-import-sort': simpleImportSort,
+      lingui,
+      'react-compiler': reactCompiler,
+      'bsky-internal': bskyInternal,
+    },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parser: tsParser,
+      globals: {
+        ...trimGlobalKeys(globals.browser),
+        ...trimGlobalKeys(globals.node),
+      },
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+      componentWrapperFunctions: ['observer'],
+    },
+    rules: {
+      /**
+       * Custom rules
+       */
+      'bsky-internal/avoid-unwrapped-text': [
+        'error',
+        {
+          impliedTextComponents: [
+            'H1',
+            'H2',
+            'H3',
+            'H4',
+            'H5',
+            'H6',
+            'P',
+            'Admonition',
+            'Admonition.Admonition',
+            'Toast.Action',
+            'AgeAssuranceAdmonition',
+            'Span',
+            'StackedButton',
+          ],
+          impliedTextProps: [],
+          suggestedTextWrappers: {
+            Button: 'ButtonText',
+            'ToggleButton.Button': 'ToggleButton.ButtonText',
+            'SegmentedControl.Item': 'SegmentedControl.ItemText',
+          },
+        },
+      ],
+      'bsky-internal/use-exact-imports': 'error',
+      'bsky-internal/use-prefixed-imports': 'error',
+      'bsky-internal/lingui-msg-rule': 'error',
+
+      /**
+       * React & React Native
+       */
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
+      ...reactHooks.configs.recommended.rules,
+      'react/no-unescaped-entities': 'off',
+      'react/prop-types': 'off',
+      'react-native/no-inline-styles': 'off',
+      ...reactNativeA11y.configs.all.rules,
+      'react-native-a11y/has-valid-accessibility-descriptors': 'off',
+      'react-compiler/react-compiler': 'off',
+
+      /**
+       * Import sorting
+       */
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            // Side effect imports.
+            ['^\\u0000'],
+            // Node.js builtins prefixed with `node:`.
+            ['^node:'],
+            // Packages.
+            // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
+            // React/React Native prioritized, followed by expo
+            // Followed by all packages excluding unprefixed relative ones
+            [
+              '^(react\\/(.*)$)|^(react$)|^(react-native(.*)$)',
+              '^(expo(.*)$)|^(expo$)',
+              '^(?!(?:alf|components|lib|locale|logger|platform|screens|state|view)(?:$|\\/))@?\\w',
+            ],
+            // Relative imports.
+            // Ideally, anything that starts with a dot or #
+            // due to unprefixed relative imports being used, we whitelist the relative paths we use
+            // (?:$|\\/) matches end of string or /
+            [
+              '^(?:#\\/)?(?:lib|state|logger|platform|locale)(?:$|\\/)',
+              '^(?:#\\/)?view(?:$|\\/)',
+              '^(?:#\\/)?screens(?:$|\\/)',
+              '^(?:#\\/)?alf(?:$|\\/)',
+              '^(?:#\\/)?components(?:$|\\/)',
+              '^#\\/',
+              '^\\.',
+            ],
+            // anything else - hopefully we don't have any of these
+            ['^'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
+
+      /**
+       * Import linting
+       */
+      'import/no-duplicates': 'off',
+      'import/namespace': 'off',
+      'import/named': 'off',
+      'import/default': 'off',
+      'import/no-named-as-default': 'off',
+      'import/no-named-as-default-member': 'off',
+      'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
+      'import/no-unresolved': 'off',
+
+      /**
+       * TypeScript-specific rules
+       */
+      'no-unused-vars': 'off', // off, we use TS-specific rule below
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_.+',
+          caughtErrors: 'none',
+          ignoreRestSiblings: true,
+        },
+      ],
+      '@typescript-eslint/consistent-type-imports': [
+        'warn',
+        {prefer: 'type-imports', fixStyle: 'inline-type-imports'},
+      ],
+      '@typescript-eslint/ban-types': 'off',
+      '@typescript-eslint/no-duplicate-enum-values': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unused-expressions': ['error', {
+        allowTernary: true,
+      }],
+      '@typescript-eslint/restrict-template-expressions': 'off',
+      /**
+       * Maintain previous behavior - these are stricter in typescript-eslint
+       * v8 `warn` ones are probably worth fixing. `off` ones are a bit too
+       * nit-picky
+       */
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
+      '@typescript-eslint/no-duplicate-type-constituents': 'off',
+      '@typescript-eslint/no-base-to-string': 'warn',
+      '@typescript-eslint/prefer-promise-reject-errors': 'warn',
+      '@typescript-eslint/await-thenable': 'warn',
+
+      /**
+       * Turn off rules that we haven't enforced thus far
+       */
+      'no-empty-pattern': 'off',
+      'no-async-promise-executor': 'off',
+      'no-constant-binary-expression': 'off',
+      'prefer-const': 'off',
+      'no-empty': 'off',
+      'no-unsafe-optional-chaining': 'off',
+      'no-prototype-builtins': 'off',
+      'no-var': 'off',
+      'prefer-rest-params': 'off',
+      'no-case-declarations': 'off',
+      'no-irregular-whitespace': 'off',
+      'no-useless-escape': 'off',
+      'no-sparse-arrays': 'off',
+      'no-fallthrough': 'off',
+      'no-control-regex': 'off',
+    },
+  },
+
+  /**
+   * Test files configuration
+   */
+  {
+    files: ['**/__tests__/**/*.{js,jsx,ts,tsx}', '**/*.test.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...trimGlobalKeys(globals.jest),
+      }
+    },
+  },
+)
