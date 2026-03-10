@@ -48,7 +48,7 @@ jobs:
         run: npx expo prebuild --platform ios --no-install
 
       - name: 🔧 Copy assets into generated iOS directory
-        run: cp -R assets/. "ios/TV Time/"
+        run: cp -R assets/. ios/Bluesky/
 
       - name: 📦 Install Pods
         run: |
@@ -60,10 +60,11 @@ jobs:
 
       - name: 🔨 Archive (no code signing)
         run: |
+          set -o pipefail
           xcodebuild archive \
-            -workspace "ios/TV Time.xcworkspace" \
-            -scheme "TV Time" \
-            -archivePath "$RUNNER_TEMP/TV Time.xcarchive" \
+            -workspace ios/Bluesky.xcworkspace \
+            -scheme Bluesky \
+            -archivePath $RUNNER_TEMP/Bluesky.xcarchive \
             -sdk iphoneos \
             -arch arm64 \
             -configuration Release \
@@ -80,12 +81,12 @@ jobs:
           path: ${{ runner.temp }}/
 
       - name: 🔍 Debug - list xcarchive contents
-        run: find "$RUNNER_TEMP/TV Time.xcarchive" -type d
+        run: find $RUNNER_TEMP/Bluesky.xcarchive -type d
 
       - name: 📦 Package unsigned IPA
         run: |
           mkdir -p $RUNNER_TEMP/Payload
-          cp -r "$RUNNER_TEMP/TV Time.xcarchive/Products/Applications/TV Time.app" \
+          cp -r "$RUNNER_TEMP/Bluesky.xcarchive/Products/Applications/Bluesky.app" \
             $RUNNER_TEMP/Payload/
           cd $RUNNER_TEMP
           zip -r TV-Time.ipa Payload/
