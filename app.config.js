@@ -47,7 +47,7 @@ module.exports = function (_config) {
       version: VERSION,
       name: 'TV Time',
       slug: 'bluesky',
-      scheme: 'bluesky',
+      scheme: 'tenna',
       owner: 'blueskysocial',
       runtimeVersion: {
         policy: 'appVersion',
@@ -58,7 +58,7 @@ module.exports = function (_config) {
       newArchEnabled: false,
       ios: {
         supportsTablet: false,
-        bundleIdentifier: 'xyz.blueskyweb.app',
+        bundleIdentifier: 'download.darkworld.atproto.client',
         config: {
           usesNonExemptEncryption: false,
         },
@@ -73,7 +73,7 @@ module.exports = function (_config) {
             'Used to save images to your library.',
           NSPhotoLibraryUsageDescription:
             'Used for profile pictures, posts, and other kinds of content',
-          CFBundleSpokenName: 'Blue Sky',
+          CFBundleSpokenName: 'TV Time',
           CFBundleLocalizations: [
             'en',
             'an',
@@ -430,7 +430,8 @@ module.exports = function (_config) {
                 appExtensions: [
                   {
                     targetName: 'Share-with-Bluesky',
-                    bundleIdentifier: 'xyz.blueskyweb.app.Share-with-Bluesky',
+                    bundleIdentifier:
+                      'download.darkworld.atproto.client.Share-with-Bluesky',
                     entitlements: {
                       'com.apple.security.application-groups': [
                         'group.app.bsky',
@@ -439,7 +440,8 @@ module.exports = function (_config) {
                   },
                   {
                     targetName: 'BlueskyNSE',
-                    bundleIdentifier: 'xyz.blueskyweb.app.BlueskyNSE',
+                    bundleIdentifier:
+                      'download.darkworld.atproto.client.BlueskyNSE',
                     entitlements: {
                       'com.apple.security.application-groups': [
                         'group.app.bsky',
@@ -448,7 +450,8 @@ module.exports = function (_config) {
                   },
                   {
                     targetName: 'BlueskyClip',
-                    bundleIdentifier: 'xyz.blueskyweb.app.AppClip',
+                    bundleIdentifier:
+                      'download.darkworld.atproto.client.AppClip',
                   },
                 ],
               },

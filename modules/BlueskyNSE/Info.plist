@@ -10,11 +10,11 @@
       <string>$(PRODUCT_MODULE_NAME).NotificationService</string>
     </dict>
     <key>MainAppScheme</key>
-    <string>bluesky</string>
+    <string>tenna</string>
     <key>CFBundleName</key>
     <string>$(PRODUCT_NAME)</string>
     <key>CFBundleDisplayName</key>
-    <string>Bluesky Notifications</string>
+    <string>AT Protocol Notifications</string>
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
     <key>CFBundleVersion</key>
