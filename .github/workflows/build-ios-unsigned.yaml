@@ -48,7 +48,7 @@ jobs:
         run: npx expo prebuild --platform ios --no-install
 
       - name: 🔧 Copy assets into generated iOS directory
-        run: cp -R assets/. ios/Witchsky/
+        run: cp -R assets/. "ios/TV Time/"
 
       - name: 📦 Install Pods
         run: |
@@ -61,9 +61,9 @@ jobs:
       - name: 🔨 Archive (no code signing)
         run: |
           xcodebuild archive \
-            -workspace ios/Witchsky.xcworkspace \
-            -scheme Witchsky \
-            -archivePath $RUNNER_TEMP/Witchsky.xcarchive \
+            -workspace "ios/TV Time.xcworkspace" \
+            -scheme "TV Time" \
+            -archivePath "$RUNNER_TEMP/TV Time.xcarchive" \
             -sdk iphoneos \
             -arch arm64 \
             -configuration Release \
@@ -80,18 +80,18 @@ jobs:
           path: ${{ runner.temp }}/
 
       - name: 🔍 Debug - list xcarchive contents
-        run: find $RUNNER_TEMP/Witchsky.xcarchive -type d
+        run: find "$RUNNER_TEMP/TV Time.xcarchive" -type d
 
       - name: 📦 Package unsigned IPA
         run: |
           mkdir -p $RUNNER_TEMP/Payload
-          cp -r "$RUNNER_TEMP/Witchsky.xcarchive/Products/Applications/Witchsky.app" \
+          cp -r "$RUNNER_TEMP/TV Time.xcarchive/Products/Applications/TV Time.app" \
             $RUNNER_TEMP/Payload/
           cd $RUNNER_TEMP
-          zip -r Witchsky.ipa Payload/
+          zip -r TV-Time.ipa Payload/
 
       - name: ⬆️ Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Witchsky.ipa
-          path: ${{ runner.temp }}/Witchsky.ipa
+          name: TV-Time.ipa
+          path: ${{ runner.temp }}/TV-Time.ipa
