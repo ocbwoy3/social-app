@@ -47,8 +47,47 @@ jobs:
       - name: 🏗️ Prebuild (generate native iOS project via Expo)
         run: npx expo prebuild --platform ios --no-install
 
+      - name: 🔎 Resolve iOS workspace, scheme, and archive paths
+        run: |
+          set -euo pipefail
+
+          IOS_WORKSPACE=$(ls -1 ios/*.xcworkspace | head -n 1)
+          if [ -z "$IOS_WORKSPACE" ]; then
+            echo "No iOS workspace found under ios/*.xcworkspace"
+            exit 1
+          fi
+
+          IOS_PROJECT_NAME=$(basename "$IOS_WORKSPACE" .xcworkspace)
+          IOS_SCHEME=$(xcodebuild -workspace "$IOS_WORKSPACE" -list -json | jq -r '.workspace.schemes[]' | grep -v '^Pods-' | head -n 1)
+
+          if [ -z "$IOS_SCHEME" ]; then
+            echo "No usable iOS scheme found in $IOS_WORKSPACE"
+            exit 1
+          fi
+
+          IOS_APP_DIR="ios/$IOS_PROJECT_NAME"
+          if [ ! -d "$IOS_APP_DIR" ]; then
+            IOS_APP_DIR=$(find ios -maxdepth 1 -mindepth 1 -type d -exec test -f "{}/Info.plist" ';' -print | head -n 1)
+          fi
+
+          if [ -z "$IOS_APP_DIR" ] || [ ! -d "$IOS_APP_DIR" ]; then
+            echo "Could not determine iOS app directory containing Info.plist"
+            exit 1
+          fi
+
+          IOS_ARCHIVE_PATH="$RUNNER_TEMP/${IOS_PROJECT_NAME}.xcarchive"
+          IOS_IPA_PATH="$RUNNER_TEMP/${IOS_PROJECT_NAME}.ipa"
+
+          {
+            echo "IOS_WORKSPACE=$IOS_WORKSPACE"
+            echo "IOS_SCHEME=$IOS_SCHEME"
+            echo "IOS_APP_DIR=$IOS_APP_DIR"
+            echo "IOS_ARCHIVE_PATH=$IOS_ARCHIVE_PATH"
+            echo "IOS_IPA_PATH=$IOS_IPA_PATH"
+          } >> "$GITHUB_ENV"
+
       - name: 🔧 Copy assets into generated iOS directory
-        run: cp -R assets/. ios/Witchsky/
+        run: cp -R assets/. "$IOS_APP_DIR/"
 
       - name: 📦 Install Pods
         run: |
@@ -61,9 +100,9 @@ jobs:
       - name: 🔨 Archive (no code signing)
         run: |
           xcodebuild archive \
-            -workspace ios/Witchsky.xcworkspace \
-            -scheme Witchsky \
-            -archivePath $RUNNER_TEMP/Witchsky.xcarchive \
+            -workspace "$IOS_WORKSPACE" \
+            -scheme "$IOS_SCHEME" \
+            -archivePath "$IOS_ARCHIVE_PATH" \
             -sdk iphoneos \
             -arch arm64 \
             -configuration Release \
@@ -80,18 +119,24 @@ jobs:
           path: ${{ runner.temp }}/
 
       - name: 🔍 Debug - list xcarchive contents
-        run: find $RUNNER_TEMP/Witchsky.xcarchive -type d
+        run: find "$IOS_ARCHIVE_PATH" -type d
 
       - name: 📦 Package unsigned IPA
         run: |
+          APP_PATH=$(find "$IOS_ARCHIVE_PATH/Products/Applications" -maxdepth 1 -type d -name "*.app" | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app found in archive at $IOS_ARCHIVE_PATH/Products/Applications"
+            exit 1
+          fi
+
           mkdir -p $RUNNER_TEMP/Payload
-          cp -r "$RUNNER_TEMP/Witchsky.xcarchive/Products/Applications/Witchsky.app" \
+          cp -r "$APP_PATH" \
             $RUNNER_TEMP/Payload/
           cd $RUNNER_TEMP
-          zip -r Witchsky.ipa Payload/
+          zip -r "$(basename "$IOS_IPA_PATH")" Payload/
 
       - name: ⬆️ Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Witchsky.ipa
-          path: ${{ runner.temp }}/Witchsky.ipa
+          name: unsigned-ios.ipa
+          path: ${{ env.IOS_IPA_PATH }}
