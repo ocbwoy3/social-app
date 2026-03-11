@@ -80,10 +80,17 @@ export function ForceAlterEgoDialog({
                   a.justify_between,
                   a.gap_sm,
                 ]}>
-                <View style={[a.flex_row, a.align_center, a.gap_sm]}>
+                <View
+                  style={[
+                    a.flex_1,
+                    a.flex_row,
+                    a.align_center,
+                    a.gap_sm,
+                    {minWidth: 0},
+                  ]}>
                   <UserAvatar
                     size={40}
-                    avatar={activeRecord.avatar}
+                    avatar={activeRecord?.avatar}
                     type="user"
                   />
                   <View style={[a.flex_1]}>
@@ -152,7 +159,14 @@ export function ForceAlterEgoDialog({
                         a.justify_between,
                         a.gap_sm,
                       ]}>
-                      <View style={[a.flex_row, a.align_center, a.gap_sm]}>
+                      <View
+                        style={[
+                          a.flex_1,
+                          a.flex_row,
+                          a.align_center,
+                          a.gap_sm,
+                          {minWidth: 0},
+                        ]}>
                         <UserAvatar
                           size={40}
                           avatar={record.avatar}

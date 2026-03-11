@@ -158,7 +158,14 @@ export function CrackAlterEgoSettingsScreen({}: Props) {
           </View>
 
           <View style={[a.pt_2xl]}>
-            <View style={[a.flex_row, a.align_center, a.justify_between]}>
+            <View
+              style={[
+                a.flex_row,
+                a.align_center,
+                a.justify_between,
+                a.gap_sm,
+                {flexWrap: 'wrap'},
+              ]}>
               <Text
                 style={[
                   a.text_md,
@@ -167,7 +174,7 @@ export function CrackAlterEgoSettingsScreen({}: Props) {
                 ]}>
                 <Trans>Your Alter Egos</Trans>
               </Text>
-              <View style={[a.flex_row, a.gap_sm]}>
+              <View style={[a.flex_row, a.gap_sm, {flexWrap: 'wrap'}]}>
                 <Button
                   variant="solid"
                   color="primary"
@@ -293,7 +300,14 @@ export function CrackAlterEgoSettingsScreen({}: Props) {
                           a.p_sm,
                           a.gap_sm,
                         ]}>
-                        <View style={[a.flex_row, a.align_center, a.gap_sm]}>
+                        <View
+                          style={[
+                            a.flex_1,
+                            a.flex_row,
+                            a.align_center,
+                            a.gap_sm,
+                            {minWidth: 0},
+                          ]}>
                           <UserAvatar
                             size={36}
                             avatar={record.avatar}
@@ -407,9 +421,11 @@ function ToggleRow({
       ]}>
       <View style={[a.flex_1, a.gap_2xs]}>
         <Text style={[a.text_md, a.font_semi_bold]}>{title}</Text>
-        <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>
-          {description}
-        </Text>
+        {Boolean(description) && (
+          <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>
+            {description}
+          </Text>
+        )}
       </View>
       <Toggle.Item
         label={title}

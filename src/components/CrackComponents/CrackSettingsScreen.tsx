@@ -6,8 +6,11 @@ import {
   useReducer,
 } from 'react'
 import {View} from 'react-native'
-import {msg, Trans} from '@lingui/macro'
+import * as Device from 'expo-device'
+import {isNative} from '@bsky.app/alf'
+import {msg} from '@lingui/core/macro'
 import {useLingui} from '@lingui/react'
+import {Trans} from '@lingui/react/macro'
 import {useNavigation} from '@react-navigation/native'
 import {type NativeStackScreenProps} from '@react-navigation/native-stack'
 
@@ -51,6 +54,7 @@ import {
   Features as GrowthbookFeatures,
   features as growthbook,
 } from '#/analytics/features'
+import packageJson from '../../../package.json'
 import {ShieldCheck_Stroke2_Corner0_Rounded as ShieldIcon} from '../icons/Shield'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'CrackSettings'>
@@ -159,6 +163,25 @@ export function CrackSettingsScreen({}: Props) {
               </View>
             )
           })}
+          {isNative ? (
+            <View style={[a.pt_lg]}>
+              <Text style={[a.text_center]}>
+                Expo SDK {packageJson.dependencies.expo}, React Native{' '}
+                {packageJson.dependencies['react-native']}
+              </Text>
+              <Text style={[a.text_center]}>
+                Running on {Device.brand === 'Apple' ? 'iOS' : 'Unknown'}{' '}
+                {Device.osVersion} ({Device.osInternalBuildId})
+              </Text>
+              <Text style={[a.text_center]}>
+                {Device.modelId} {Device.supportedCpuArchitectures}
+              </Text>
+            </View>
+          ) : (
+            <View style={[a.pt_lg]}>
+              <Text style={[a.text_center]}>No React Native?</Text>
+            </View>
+          )}
         </View>
       </Layout.Content>
     </Layout.Screen>
@@ -215,9 +238,11 @@ function ToggleRow({
         <Icon size="md" style={[t.atoms.text_contrast_medium]} />
         <View style={[a.flex_1, a.gap_2xs]}>
           <Text style={[a.text_md, a.font_semi_bold]}>{title}</Text>
-          <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>
-            {description}
-          </Text>
+          {description && (
+            <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>
+              {description}
+            </Text>
+          )}
           {status && (
             <Text style={[a.text_xs, t.atoms.text_contrast_medium]}>
               {status}
@@ -326,7 +351,7 @@ function FeatureGateOverrides() {
     <View>
       {FEATURE_GATES.map((gate, index) => {
         const value = ax.features.enabled(gate)
-        const status = value ? _(msg`Enabled`) : _(msg`Disabled`)
+        // const status = value ? _(msg`Enabled`) : _(msg`Disabled`)
 
         return (
           <Fragment key={gate}>
@@ -335,7 +360,7 @@ function FeatureGateOverrides() {
               icon={FilterIcon}
               title={gate}
               description={''}
-              status={status}
+              // status={status}
               name={gate}
               value={value}
               onChange={next => setOverride(gate, next)}

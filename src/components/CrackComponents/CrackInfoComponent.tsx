@@ -24,7 +24,7 @@ export function CrackCreditsInfo({
       {/* <Text style={[a.text_3xl]}>It's TV Time!</Text> */}
       <Logotype width={128} />
       <Text style={[a.text_sm, withThirdPartyNotice && {paddingBottom: 16}]}>
-        the fun gang is watching...
+        Of course Kris did it
       </Text>
       {withThirdPartyNotice && (
         <Text style={[a.text_center, t.atoms.text_contrast_low]}>
