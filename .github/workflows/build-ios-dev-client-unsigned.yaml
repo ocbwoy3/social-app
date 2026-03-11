@@ -1,0 +1,96 @@
+name: Build iOS dev client IPA (unsigned)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+
+      - name: 🔧 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: 🪛 Setup jq
+        uses: dcarbone/install-jq-action@v2
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "latest-stable"
+
+      - name: ☕️ Setup Cocoapods
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: 1.16.2
+
+      - name: ⚙️ Install JS dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: 🔤 Compile translations
+        run: yarn intl:build
+
+      - name: ✏️ Write environment variables
+        run: |
+          echo "EXPO_PUBLIC_RELEASE_VERSION=$(jq -r '.version' package.json)" >> .env
+          echo "EXPO_PUBLIC_BUNDLE_IDENTIFIER=$(git rev-parse HEAD)" >> .env
+          echo "EXPO_PUBLIC_BUNDLE_DATE=$(date -u +"%y%m%d%H")" >> .env
+
+      - name: 🏗️ Prebuild (dev client)
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: 🔧 Copy assets into generated iOS directory
+        run: cp -R assets/. ios/TVTime/
+
+      - name: 📦 Install Pods
+        run: |
+          cd ios
+          pod install
+
+      - name: 🔍 Debug - list ios directory
+        run: ls -la ios/
+
+      - name: 🔨 Build dev client archive (no code signing)
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -workspace ios/TVTime.xcworkspace \
+            -scheme TVTime \
+            -archivePath $RUNNER_TEMP/TVTime-dev.xcarchive \
+            -sdk iphoneos \
+            -arch arm64 \
+            -configuration Debug \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty
+
+      - name: 📦 Upload RUNNER_TEMP for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runner-temp-debug-dev-client
+          path: ${{ runner.temp }}/
+
+      - name: 🔍 Debug - list xcarchive contents
+        run: find $RUNNER_TEMP/TVTime-dev.xcarchive -type d
+
+      - name: 📦 Package unsigned dev client IPA
+        run: |
+          mkdir -p $RUNNER_TEMP/Payload
+          cp -r "$RUNNER_TEMP/TVTime-dev.xcarchive/Products/Applications/TVTime.app" \
+            $RUNNER_TEMP/Payload/
+          cd $RUNNER_TEMP
+          zip -r TV-Time-dev-client.ipa Payload/
+
+      - name: ⬆️ Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TV-Time-dev-client.ipa
+          path: ${{ runner.temp }}/TV-Time-dev-client.ipa

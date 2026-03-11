@@ -1,5 +1,6 @@
 import {useCallback, useEffect} from 'react'
 import {Platform} from 'react-native'
+import * as Application from 'expo-application'
 import * as Notifications from 'expo-notifications'
 import {getBadgeCountAsync, setBadgeCountAsync} from 'expo-notifications'
 import {type AppBskyNotificationRegisterPush, type AtpAgent} from '@atproto/api'
@@ -16,7 +17,9 @@ import {type SessionAccount, useAgent, useSession} from '#/state/session'
 import BackgroundNotificationHandler from '#/../modules/expo-background-notification-handler'
 import {useAgeAssurance} from '#/ageAssurance'
 import {useAnalytics} from '#/analytics'
-import {IS_DEV, IS_NATIVE} from '#/env'
+import {IS_NATIVE} from '#/env'
+
+const NOTIFICATIONS_APP_ID = Application.applicationId || 'xyz.blueskyweb.app'
 
 /**
  * @private
@@ -42,7 +45,7 @@ async function _registerPushToken({
         : PUBLIC_APPVIEW_DID,
       platform: Platform.OS,
       token: token.data,
-      appId: 'xyz.blueskyweb.app',
+      appId: NOTIFICATIONS_APP_ID,
       ageRestricted: extra.ageRestricted ?? false,
     }
 
@@ -139,7 +142,7 @@ export function useGetAndRegisterPushToken() {
     }: {
       isAgeRestricted?: boolean
     } = {}) => {
-      if (!IS_NATIVE || IS_DEV) return
+      if (!IS_NATIVE) return
 
       /**
        * This will also fire the listener added via `addPushTokenListener`. That
@@ -308,7 +311,7 @@ export async function unregisterPushToken(agents: AtpAgent[]) {
               : PUBLIC_APPVIEW_DID,
             platform: Platform.OS,
             token: token.data,
-            appId: 'xyz.blueskyweb.app',
+            appId: NOTIFICATIONS_APP_ID,
           },
           {
             headers: BLUESKY_NOTIF_SERVICE_HEADERS,
