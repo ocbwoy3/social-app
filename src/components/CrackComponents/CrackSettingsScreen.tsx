@@ -22,11 +22,7 @@ import {
   useSetStatsigGateOverride,
   useStatsigGateOverrides,
 } from '#/state/crack/statsig-overrides'
-import {
-  emitOpenNuxDialog,
-  emitOpenSettingsHelpModal,
-  emitOpenWelcomeModal,
-} from '#/state/events'
+import {emitOpenNuxDialog, emitOpenWelcomeModal} from '#/state/events'
 import {
   type CrackSettings,
   type CrackSettingsButtonItem,
@@ -74,9 +70,6 @@ export function CrackSettingsScreen({}: Props) {
     switch (item.id) {
       case 'openWelcomeModal':
         emitOpenWelcomeModal()
-        break
-      case 'openSettingsHelpModal':
-        emitOpenSettingsHelpModal()
         break
       case 'openVerificationSettings':
         navigation.navigate('CrackVerificationSettings')
@@ -170,7 +163,7 @@ export function CrackSettingsScreen({}: Props) {
                 {packageJson.dependencies['react-native']}
               </Text>
               <Text style={[a.text_center]}>
-                Running on {Device.brand === 'Apple' ? 'iOS' : 'Unknown'}{' '}
+                Running on {Device.brand === 'Apple' ? 'iOS' : 'Android'}{' '}
                 {Device.osVersion} ({Device.osInternalBuildId})
               </Text>
               <Text style={[a.text_center]}>
@@ -179,7 +172,9 @@ export function CrackSettingsScreen({}: Props) {
             </View>
           ) : (
             <View style={[a.pt_lg]}>
-              <Text style={[a.text_center]}>No React Native?</Text>
+              <Text style={[a.text_center]}>
+                No React Native? ({Device.osName} {Device.osVersion})
+              </Text>
             </View>
           )}
         </View>

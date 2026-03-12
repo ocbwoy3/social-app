@@ -200,7 +200,7 @@ export const crackSettingsSections: CrackSettingsSection[] = [
     items: [
       {
         type: 'button',
-        id: 'openSettingsHelpModal',
+        id: 'openNux:SettingsHowToAnnouncement',
         label: 'Settings - Welcome',
         description: "What you'd see by default.",
         buttonLabel: 'Open',

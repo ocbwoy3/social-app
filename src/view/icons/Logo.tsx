@@ -13,11 +13,12 @@ type Props = {
   style?: TextProps['style']
 } & Omit<SvgProps, 'style'>
 
-export const Logo = React.forwardRef(function LogoImpl(props: Props) {
+export const Logo = React.forwardRef(function LogoImpl(props: Props, ref) {
   const {fill, ...rest} = props
   const gradient = fill === 'sky'
   const styles = flatten(props.style)
   const _fill = gradient ? 'url(#sky)' : fill || styles?.color || defaultFill
+  const _ref = ref
   // @ts-ignore it's fiiiiine
   const size = parseInt(rest.width || 32, 10)
 

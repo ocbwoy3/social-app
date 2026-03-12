@@ -31,6 +31,8 @@ import {
   enabled as isLiveNowBetaDialogEnabled,
   LiveNowBetaDialog,
 } from '#/components/dialogs/nuxs/LiveNowBetaDialog'
+import {SettingsHowToAnnouncement} from '#/components/dialogs/nuxs/SettingsHowToAnnouncement'
+import {isSettingsHowToAnnouncementEnabled} from '#/components/dialogs/nuxs/SettingsHowToAnnouncementGate'
 import {isSnoozed, snooze, unsnooze} from '#/components/dialogs/nuxs/snoozing'
 import {type EnabledCheckProps} from '#/components/dialogs/nuxs/utils'
 import {useAnalytics} from '#/analytics'
@@ -45,6 +47,10 @@ const queuedNuxs: {
   id: Nux
   enabled?: (props: EnabledCheckProps) => boolean
 }[] = [
+  {
+    id: Nux.SettingsHowToAnnouncement,
+    enabled: isSettingsHowToAnnouncementEnabled,
+  },
   {
     id: Nux.DraftsAnnouncement,
     enabled: isDraftsAnnouncementEnabled,
@@ -216,6 +222,9 @@ function Inner({
       {activeNux === Nux.ActivitySubscriptions && <ActivitySubscriptionsNUX />}
       {activeNux === Nux.LiveNowBetaDialog && <LiveNowBetaDialog />}
       {activeNux === Nux.DraftsAnnouncement && <DraftsAnnouncement />}
+      {activeNux === Nux.SettingsHowToAnnouncement && (
+        <SettingsHowToAnnouncement />
+      )}
     </Context.Provider>
   )
 }
