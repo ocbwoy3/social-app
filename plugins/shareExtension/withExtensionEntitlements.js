@@ -11,9 +11,10 @@ const withExtensionEntitlements = (config, {extensionName}) => {
       extensionName,
       `${extensionName}.entitlements`,
     )
+    const appGroup = 'group.download.darkworld'
 
     const shareExtensionEntitlements = {
-      'com.apple.security.application-groups': [`group.app.bsky`],
+      'com.apple.security.application-groups': [appGroup],
     }
 
     fs.mkdirSync(path.dirname(extensionEntitlementsPath), {

@@ -34,6 +34,8 @@ module.exports = function (_config) {
   const UPDATES_ENABLED = IS_TESTFLIGHT || IS_PRODUCTION
 
   const USE_SENTRY = Boolean(process.env.SENTRY_AUTH_TOKEN)
+  const IOS_BUNDLE_IDENTIFIER = 'download.darkworld.atproto.client'
+  const IOS_APP_GROUP = 'group.download.darkworld'
 
   const IOS_ICON_FILE =
     PLATFORM === 'web' // web build doesn't like .icon files
@@ -58,7 +60,7 @@ module.exports = function (_config) {
       newArchEnabled: false,
       ios: {
         supportsTablet: false,
-        bundleIdentifier: 'download.darkworld.atproto.client',
+        bundleIdentifier: IOS_BUNDLE_IDENTIFIER,
         config: {
           usesNonExemptEncryption: false,
         },
@@ -121,7 +123,7 @@ module.exports = function (_config) {
         entitlements: {
           'com.apple.developer.kernel.increased-memory-limit': true,
           'com.apple.developer.kernel.extended-virtual-addressing': true,
-          'com.apple.security.application-groups': 'group.app.bsky',
+          'com.apple.security.application-groups': IOS_APP_GROUP,
           // 'com.apple.developer.device-information.user-assigned-device-name': true,
         },
         privacyManifests: {
@@ -430,28 +432,21 @@ module.exports = function (_config) {
                 appExtensions: [
                   {
                     targetName: 'Share-with-Bluesky',
-                    bundleIdentifier:
-                      'download.darkworld.atproto.client.Share-with-Bluesky',
+                    bundleIdentifier: `${IOS_BUNDLE_IDENTIFIER}.Share-with-Bluesky`,
                     entitlements: {
-                      'com.apple.security.application-groups': [
-                        'group.app.bsky',
-                      ],
+                      'com.apple.security.application-groups': [IOS_APP_GROUP],
                     },
                   },
                   {
                     targetName: 'BlueskyNSE',
-                    bundleIdentifier:
-                      'download.darkworld.atproto.client.BlueskyNSE',
+                    bundleIdentifier: `${IOS_BUNDLE_IDENTIFIER}.BlueskyNSE`,
                     entitlements: {
-                      'com.apple.security.application-groups': [
-                        'group.app.bsky',
-                      ],
+                      'com.apple.security.application-groups': [IOS_APP_GROUP],
                     },
                   },
                   {
                     targetName: 'BlueskyClip',
-                    bundleIdentifier:
-                      'download.darkworld.atproto.client.AppClip',
+                    bundleIdentifier: `${IOS_BUNDLE_IDENTIFIER}.AppClip`,
                   },
                 ],
               },
