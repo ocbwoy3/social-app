@@ -28,7 +28,6 @@ import {
   useCustomVerificationTrustedList,
 } from '#/state/verification/custom-verifiers'
 import {EventStopper} from '#/view/com/util/EventStopper'
-import * as Toast from '#/view/com/util/Toast'
 import {atoms as a, useTheme} from '#/alf'
 import {Button, ButtonIcon} from '#/components/Button'
 import {ForceAlterEgoDialog} from '#/components/crack/ForceAlterEgoDialog'
@@ -60,6 +59,7 @@ import {
   useReportDialogControl,
 } from '#/components/moderation/ReportDialog'
 import * as Prompt from '#/components/Prompt'
+import * as Toast from '#/components/Toast'
 import {useFullVerificationState} from '#/components/verification'
 import {VerificationCreatePrompt} from '#/components/verification/VerificationCreatePrompt'
 import {VerificationRemovePrompt} from '#/components/verification/VerificationRemovePrompt'
@@ -164,7 +164,9 @@ let ProfileMenu = ({
       } catch (e: any) {
         if (e?.name !== 'AbortError') {
           ax.logger.error('Failed to unmute account', {message: e})
-          Toast.show(_(msg`There was an issue! ${e.toString()}`), 'xmark')
+          Toast.show(_(msg`There was an issue! ${e.toString()}`), {
+            type: 'error',
+          })
         }
       }
     } else {
@@ -174,7 +176,9 @@ let ProfileMenu = ({
       } catch (e: any) {
         if (e?.name !== 'AbortError') {
           ax.logger.error('Failed to mute account', {message: e})
-          Toast.show(_(msg`There was an issue! ${e.toString()}`), 'xmark')
+          Toast.show(_(msg`There was an issue! ${e.toString()}`), {
+            type: 'error',
+          })
         }
       }
     }
@@ -188,7 +192,9 @@ let ProfileMenu = ({
       } catch (e: any) {
         if (e?.name !== 'AbortError') {
           ax.logger.error('Failed to unblock account', {message: e})
-          Toast.show(_(msg`There was an issue! ${e.toString()}`), 'xmark')
+          Toast.show(_(msg`There was an issue! ${e.toString()}`), {
+            type: 'error',
+          })
         }
       }
     } else {
@@ -198,7 +204,9 @@ let ProfileMenu = ({
       } catch (e: any) {
         if (e?.name !== 'AbortError') {
           ax.logger.error('Failed to block account', {message: e})
-          Toast.show(_(msg`There was an issue! ${e.toString()}`), 'xmark')
+          Toast.show(_(msg`There was an issue! ${e.toString()}`), {
+            type: 'error',
+          })
         }
       }
     }
@@ -211,7 +219,9 @@ let ProfileMenu = ({
     } catch (e: any) {
       if (e?.name !== 'AbortError') {
         ax.logger.error('Failed to follow account', {message: e})
-        Toast.show(_(msg`There was an issue! ${e.toString()}`), 'xmark')
+        Toast.show(_(msg`There was an issue! ${e.toString()}`), {
+          type: 'error',
+        })
       }
     }
   }, [_, ax, queueFollow])
@@ -223,7 +233,9 @@ let ProfileMenu = ({
     } catch (e: any) {
       if (e?.name !== 'AbortError') {
         ax.logger.error('Failed to unfollow account', {message: e})
-        Toast.show(_(msg`There was an issue! ${e.toString()}`), 'xmark')
+        Toast.show(_(msg`There was an issue! ${e.toString()}`), {
+          type: 'error',
+        })
       }
     }
   }, [_, ax, queueUnfollow])
