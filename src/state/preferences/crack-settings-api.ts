@@ -17,10 +17,15 @@ export const crackSettingsDefaults: CrackSettings = {
   alwaysShowGermDmButton: false,
   alterEgoEnabled: true,
   disableInlineComposer: false,
+  customThemesEnabled: false,
+  customThemeScheme: 'catppuccin',
   alterEgoUri: undefined,
   alterEgoByDid: {},
   alterEgoRecords: {},
   statsigGateOverrides: {},
+  atprotoFrickery: false,
+  atprotoRkeyGenerationDefault: 'tid',
+  atprotoRkeyPrefixDefault: '',
 }
 
 export type CrackSettingsToggleItem = {
@@ -59,22 +64,25 @@ export type CrackSettingsSection = {
  */
 export const APPVIEW_DEFAULT_VERIFIERS: string[] = [
   'did:plc:z72i7hdynmk6r22z27h6tvur', // Bluesky
-  'did:plc:eclio37ymobqex2ncko63h4r', // The New York Times
-  'did:plc:inz4fkbbp7ms3ixufw6xuvdi', // WIRED
   'did:plc:b2kutgxqlltwc6lhs724cfwr', // The Athletic
-  'did:plc:wmho6q2uiyktkam3jsvrms3s', // NBC News
-  'did:plc:sqbswn3lalcc2dlh2k7zdpuw', // Yahoo Finance
-  'did:plc:y3xrmnwvkvsq4tqcsgwch4na', // The Globe and Mail
-  'did:plc:d2jith367s6ybc3ldsusgdae', // Los Angeles Times
+  'did:plc:inz4fkbbp7ms3ixufw6xuvdi', // WIRED
+  'did:plc:eclio37ymobqex2ncko63h4r', // The New York Times
   'did:plc:dzezcmpb3fhcpns4n4xm4ur5', // CNN
   'did:plc:5u54z2qgkq43dh2nzwzdbbhb', // Financial Times
-  'did:plc:xwqgusybtrpm67tcwqdfmzvy', // IGN
+  'did:plc:wmho6q2uiyktkam3jsvrms3s', // NBC News
+  'did:plc:sqbswn3lalcc2dlh2k7zdpuw', // Yahoo Finance
   'did:plc:k5nskatzhyxersjilvtnz4lh', // The Washington Post
+  'did:plc:d2jith367s6ybc3ldsusgdae', // Los Angeles Times
+  'did:plc:y3xrmnwvkvsq4tqcsgwch4na', // The Globe and Mail
+  'did:plc:i3fhjvvkbmirhyu4aeihhrnv', // Bloomberg News
+  'did:plc:xwqgusybtrpm67tcwqdfmzvy', // IGN
   'did:plc:fivojrvylkim4nuo3pfqcf3k', // Microsoft
-
-  // not listed in blu.ski:
-  'did:plc:2w45zyhuklwihpdc7oj3mi63', // Forbes
+  'did:plc:ofbkqcjzvm6gtwuufsubnkaf', // Rolling Stone
   'did:plc:oxo226vi7t2btjokm2buusoy', // European Commision
+  'did:plc:r4ve5hjtfjubdwrvlxcad62e', // Reuters
+  'did:plc:j4eroku3volozvv6ljsnnfec', // World Health Organization (WHO)
+  'did:plc:6q2thhy2ohzog26mmqm4pffk', // Forbes
+  'did:plc:rk25gdgk3cnnmtkvlae265nz', // Ars Technica
 ]
 
 /**
@@ -128,6 +136,12 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         label: 'Rename posts to skeets',
         description: 'Only affects English UI labels.',
       },
+      {
+        type: 'toggle',
+        key: 'customThemesEnabled',
+        label: 'Enable custom themes',
+        description: 'Show theme picker in appearance settings.',
+      },
     ],
   },
   {
@@ -173,6 +187,12 @@ export const crackSettingsSections: CrackSettingsSection[] = [
     title: 'Advanced',
     description: 'Power-user and protocol overrides.',
     items: [
+      {
+        type: 'toggle',
+        key: 'atprotoFrickery',
+        label: 'ATProto Frickery',
+        description: 'Enable extra protocol-level shenanigans.',
+      },
       {
         type: 'toggle',
         key: 'hijackHideLabels',

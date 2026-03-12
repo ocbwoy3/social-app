@@ -137,6 +137,20 @@ const schema = z.object({
       alwaysShowGermDmButton: z.boolean().optional(),
       alterEgoEnabled: z.boolean().optional(),
       disableInlineComposer: z.boolean().optional(),
+      customThemesEnabled: z.boolean().optional(),
+      customThemeScheme: z
+        .enum([
+          'witchsky',
+          'bluesky',
+          'blacksky',
+          'deer',
+          'zeppelin',
+          'kitty',
+          'reddwarf',
+          'catppuccin',
+          'evergarden',
+        ])
+        .optional(),
       alterEgoUri: z.string().optional(),
       alterEgoByDid: z.record(z.string()).optional(),
       alterEgoRecords: z
@@ -154,6 +168,9 @@ const schema = z.object({
         )
         .optional(),
       statsigGateOverrides: z.record(z.boolean()).optional(),
+      atprotoFrickery: z.boolean().optional(),
+      atprotoRkeyGenerationDefault: z.enum(['tid', 'prefix']).optional(),
+      atprotoRkeyPrefixDefault: z.string().optional(),
     })
     .optional(),
   hasCheckedForStarterPack: z.boolean().optional(),
@@ -218,10 +235,15 @@ export const defaults: Schema = {
     alwaysShowGermDmButton: false,
     alterEgoEnabled: true,
     disableInlineComposer: true,
+    customThemesEnabled: false,
+    customThemeScheme: 'catppuccin',
     alterEgoUri: undefined,
     alterEgoByDid: {},
     alterEgoRecords: {},
     statsigGateOverrides: {},
+    atprotoFrickery: false,
+    atprotoRkeyGenerationDefault: 'tid',
+    atprotoRkeyPrefixDefault: '',
   },
   hasCheckedForStarterPack: false,
   subtitlesEnabled: true,

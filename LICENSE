@@ -1,13 +1,14 @@
-Bluesky on Crack
-
-Modified portions of source code: Copyright (c) 2026 ocbwoy3
+MIT License
 
 This software is a modified version of Bluesky's app
-(github.com/bluesky-social/social-app)
+(github.com/bluesky-social/social-app) and contains ported code from Witchsky
+(tangled.org/jollywhoppers.com/witchsky.app).
+
+Copyright (c) 2026 Kris (@kris.darkworld.download)
 
 ======
 
-Copyright 2023–2026 Bluesky Social PBC
+Copyright 2023–2026 Bluesky Social PBC Copyright (c) 2025-2026 Jollywhoppers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the “Software”), to deal in

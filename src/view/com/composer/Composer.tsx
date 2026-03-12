@@ -89,7 +89,7 @@ import {
   pasteImage,
 } from '#/state/gallery'
 import {useModalControls} from '#/state/modals'
-import {useRequireAltTextEnabled} from '#/state/preferences'
+import {useCrackSettings, useRequireAltTextEnabled} from '#/state/preferences'
 import {
   fromPostLanguages,
   toPostLanguages,
@@ -104,6 +104,7 @@ import {useComposerControls} from '#/state/shell/composer'
 import {type ComposerOpts, type OnPostSuccessData} from '#/state/shell/composer'
 import {CharProgress} from '#/view/com/composer/char-progress/CharProgress'
 import {ComposerReplyTo} from '#/view/com/composer/ComposerReplyTo'
+import {AtprotoBtn} from '#/view/com/composer/crack/AtprotoBtn'
 import {DraftsButton} from '#/view/com/composer/drafts/DraftsButton'
 import {
   ExternalEmbedGif,
@@ -204,6 +205,7 @@ export const ComposePost = ({
   const currentDid = currentAccount!.did
   const {closeComposer} = useComposerControls()
   const {_} = useLingui()
+  const crackSettings = useCrackSettings()
   const requireAltTextEnabled = useRequireAltTextEnabled()
   const langPrefs = useLanguagePrefs()
   const setLangPrefs = useLanguagePrefsApi()
@@ -276,6 +278,9 @@ export const ComposePost = ({
       initText,
       initMention,
       initInteractionSettings: preferences?.postInteractionSettings,
+      initAtprotoRkeyGenerationDefault:
+        crackSettings.atprotoRkeyGenerationDefault,
+      initAtprotoRkeyPrefixDefault: crackSettings.atprotoRkeyPrefixDefault,
     },
     createComposerState,
   )
@@ -690,8 +695,16 @@ export const ComposePost = ({
     composerDispatch({
       type: 'clear',
       initInteractionSettings: preferences?.postInteractionSettings,
+      initAtprotoRkeyGenerationDefault:
+        crackSettings.atprotoRkeyGenerationDefault,
+      initAtprotoRkeyPrefixDefault: crackSettings.atprotoRkeyPrefixDefault,
     })
-  }, [composerDispatch, preferences?.postInteractionSettings])
+  }, [
+    composerDispatch,
+    preferences?.postInteractionSettings,
+    crackSettings.atprotoRkeyGenerationDefault,
+    crackSettings.atprotoRkeyPrefixDefault,
+  ])
 
   const insets = useSafeAreaInsets()
   const viewStyles = useMemo(
@@ -831,6 +844,14 @@ export const ComposePost = ({
           replyTo: replyTo?.uri,
           onStateChange: setPublishingStage,
           langs: currentLanguages,
+          atprotoRkeyGeneration: crackSettings.atprotoFrickery
+            ? thread.atprotoRkeyGeneration === 'prefix'
+              ? {
+                  type: 'prefix',
+                  prefix: thread.atprotoRkeyPrefix,
+                }
+              : {type: 'tid'}
+            : undefined,
         })
       ).uris[0]
 
@@ -997,6 +1018,7 @@ export const ComposePost = ({
     canPost,
     isPublishing,
     currentLanguages,
+    crackSettings.atprotoFrickery,
     onClose,
     onPost,
     onPostSuccess,
@@ -1103,7 +1125,6 @@ export const ComposePost = ({
         onAcceptSuggestedLanguage={setAcceptedLanguageSuggestion}
       />
       <ComposerPills
-        isReply={!!replyTo}
         post={activePost}
         thread={composerState.thread}
         dispatch={composerDispatch}
@@ -1753,13 +1774,11 @@ function ComposerEmbeds({
 }
 
 function ComposerPills({
-  isReply,
   thread,
   post,
   dispatch,
   bottomBarAnimatedStyle,
 }: {
-  isReply: boolean
   thread: ThreadDraft
   post: PostDraft
   dispatch: (action: ComposerAction) => void
@@ -1770,11 +1789,6 @@ function ComposerPills({
   const hasMedia = media?.type === 'images' || media?.type === 'video'
   const hasLink = !!post.embed.link
 
-  // Don't render anything if no pills are going to be displayed
-  if (isReply && !hasMedia && !hasLink) {
-    return null
-  }
-
   return (
     <Animated.View
       style={[a.flex_row, a.p_sm, t.atoms.bg, bottomBarAnimatedStyle]}>
@@ -1784,22 +1798,31 @@ function ComposerPills({
         bounces={false}
         keyboardShouldPersistTaps="always"
         showsHorizontalScrollIndicator={false}>
-        {isReply ? null : (
-          <ThreadgateBtn
-            postgate={thread.postgate}
-            onChangePostgate={nextPostgate => {
-              dispatch({type: 'update_postgate', postgate: nextPostgate})
-            }}
-            threadgateAllowUISettings={thread.threadgate}
-            onChangeThreadgateAllowUISettings={nextThreadgate => {
-              dispatch({
-                type: 'update_threadgate',
-                threadgate: nextThreadgate,
-              })
-            }}
-            style={bottomBarAnimatedStyle}
-          />
-        )}
+        <ThreadgateBtn
+          postgate={thread.postgate}
+          onChangePostgate={nextPostgate => {
+            dispatch({type: 'update_postgate', postgate: nextPostgate})
+          }}
+          threadgateAllowUISettings={thread.threadgate}
+          onChangeThreadgateAllowUISettings={nextThreadgate => {
+            dispatch({
+              type: 'update_threadgate',
+              threadgate: nextThreadgate,
+            })
+          }}
+          style={bottomBarAnimatedStyle}
+        />
+        <AtprotoBtn
+          generation={thread.atprotoRkeyGeneration}
+          prefix={thread.atprotoRkeyPrefix}
+          onChangeSettings={(generation, prefix) => {
+            dispatch({
+              type: 'update_atproto_rkey_settings',
+              generation,
+              prefix,
+            })
+          }}
+        />
         {hasMedia || hasLink ? (
           <LabelsBtn
             labels={post.labels}

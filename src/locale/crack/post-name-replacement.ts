@@ -5,10 +5,11 @@ import * as persisted from '#/state/persisted'
 
 function replaceInString(text: string): string {
   return text
-    .replaceAll('Posts', 'Skeets')
-    .replaceAll('posts', 'skeets')
     .replaceAll('Post', 'Skeet')
     .replaceAll('post', 'skeet')
+    .replaceAll('Posts', 'Skeets')
+    .replaceAll('posts', 'skeets')
+    .replaceAll('blog skeet', 'blog post')
 }
 
 function replaceInValue(value: unknown): unknown {

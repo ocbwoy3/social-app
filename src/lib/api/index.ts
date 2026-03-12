@@ -22,6 +22,12 @@ import {sha256} from 'js-sha256'
 import {CID} from 'multiformats/cid'
 import * as Hasher from 'multiformats/hashes/hasher'
 
+import {
+  buildPrefixedAtprotoRkey,
+  isValidAtprotoTid,
+  isValidAtprotoTidPrefix,
+  normalizeAtprotoRkey,
+} from '#/lib/crack/atproto-rkey'
 import {isNetworkError} from '#/lib/strings/errors'
 import {shortenLinks, stripInvalidMentions} from '#/lib/strings/rich-text-manip'
 import {logger} from '#/logger'
@@ -49,6 +55,12 @@ interface PostOpts {
   replyTo?: string
   onStateChange?: (state: string) => void
   langs?: string[]
+  atprotoRkeyGeneration?:
+    | {type: 'tid'}
+    | {
+        type: 'prefix'
+        prefix: string
+      }
 }
 
 export async function post(
@@ -104,7 +116,27 @@ export async function post(
     // undefined, so what we'll do here is increment the time by 1 for every post
     now.setMilliseconds(now.getMilliseconds() + 1)
     tid = TID.next(tid)
-    const rkey = tid.toString()
+    const tidRkey = tid.toString()
+    if (!isValidAtprotoTid(tidRkey)) {
+      throw new Error('Invalid TID record key')
+    }
+    let rkey = tidRkey
+    if (i === 0 && opts.atprotoRkeyGeneration) {
+      if (opts.atprotoRkeyGeneration.type === 'prefix') {
+        const normalizedPrefix = normalizeAtprotoRkey(
+          opts.atprotoRkeyGeneration.prefix,
+        )
+        if (!isValidAtprotoTidPrefix(normalizedPrefix)) {
+          throw new Error('Invalid record key prefix')
+        }
+        rkey = buildPrefixedAtprotoRkey(normalizedPrefix, tidRkey)
+        if (!isValidAtprotoTid(rkey)) {
+          throw new Error('Invalid record key prefix')
+        }
+      }
+
+      await assertRecordDoesNotExist(agent, rkey)
+    }
     const uri = `at://${did}/app.bsky.feed.post/${rkey}`
     uris.push(uri)
 
@@ -191,6 +223,33 @@ export async function post(
   }
 
   return {uris}
+}
+
+async function assertRecordDoesNotExist(agent: BskyAgent, rkey: string) {
+  try {
+    await agent.com.atproto.repo.getRecord({
+      repo: agent.assertDid,
+      collection: 'app.bsky.feed.post',
+      rkey,
+    })
+    throw new Error('Record already exists')
+  } catch (e: any) {
+    if (e?.message === 'Record already exists') {
+      throw e
+    }
+
+    const message = String(e?.message || '').toLowerCase()
+    const errorCode = String(e?.error || '').toLowerCase()
+    if (
+      message.includes('could not locate record') ||
+      message.includes('record not found') ||
+      errorCode.includes('recordnotfound')
+    ) {
+      return
+    }
+
+    throw e
+  }
 }
 
 async function resolveRT(agent: BskyAgent, richtext: RichText) {

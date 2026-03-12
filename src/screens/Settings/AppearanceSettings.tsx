@@ -13,6 +13,7 @@ import {
   type CommonNavigatorParams,
   type NativeStackScreenProps,
 } from '#/lib/routes/types'
+import {useCrackSettings} from '#/state/preferences'
 import {useSetThemePrefs, useThemePrefs} from '#/state/shell'
 import {SettingsListItem as AppIconSettingsListItem} from '#/screens/Settings/AppIconSettings/SettingsListItem'
 import {type Alf, atoms as a, native, useAlf, useTheme} from '#/alf'
@@ -26,11 +27,13 @@ import * as Layout from '#/components/Layout'
 import {Text} from '#/components/Typography'
 import {IS_INTERNAL, IS_NATIVE} from '#/env'
 import * as SettingsList from './components/SettingsList'
+import {CustomThemeSettings} from './crack/CustomThemeSettings'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'AppearanceSettings'>
 export function AppearanceSettingsScreen({}: Props) {
   const {_} = useLingui()
   const {fonts} = useAlf()
+  const {customThemesEnabled} = useCrackSettings()
 
   const {colorMode, darkTheme} = useThemePrefs()
   const {setColorMode, setDarkTheme} = useSetThemePrefs()
@@ -120,6 +123,8 @@ export function AppearanceSettingsScreen({}: Props) {
                 />
               </Animated.View>
             )}
+
+            {customThemesEnabled && <CustomThemeSettings />}
 
             <Animated.View layout={native(LinearTransition)}>
               <SettingsList.Divider />

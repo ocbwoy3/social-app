@@ -8,44 +8,55 @@ Bluesky on Crack.
 Here's a list of crack features, consolidated into each category:
 
 <details>
-<summary>Bluesky</summary>
+<summary>Settings</summary>
+
+Tools:
+
+- [x] Verification settings
+- [x] Alter Egos
+
+Appearance ([witchsky](https://tangled.org/jollywhoppers.com/witchsky.app)):
+
+- [x] Rename posts to skeets
+- [x] Custom themes
+
+Profiles:
 
 - [x] Disable suggested follows
-- [x] Rename posts to skeets
-      ([idea & core implementation from witchsky](https://tangled.org/jollywhoppers.com/witchsky.app/commit/d5bdcf84f80034ec41b19de09bdd9a73a519e89f))
-- [x] Always show the Germ DM button
-- [x] Ability to bypass !hide on other user's content
-- [x] Disable feed composer prompt
-- [x] Pronouns & profile URLs _(this is going to be an upstream feature soon,
-      the lexicon supports it)_
-- [x] Alter Egos
-  - [x] Alter Ego editor
-  - [x] Apply Alter Egos on other users
+- [x] Unrounded (expanded) metrics
+- [x] Always show Germ DM button
 
-</details>
+Feed:
 
-<details>
-<summary>AT Protocol</summary>
+- [x] Disable composer prompt
 
+Advanced:
+
+- [x] ATProto frickery
+- [x] Bypass !hide
 - [x] Remove labeler limit
 - [x] Disable AppLabelers
-- [x] Verification settings
-  - [x] Custom verifiers
-  - [x] Become a verifier
-  - [x] Labeler trusted verifier negations
+- [x] NUXs!
+- [x] Feature gate editor
 
 </details>
 
 <details>
-<summary>Other</summary>
+<summary>Features</summary>
 
-- [x] "Show NUX" option
-- [x] Feature gates editor
+- [x] Profile pronouns and link support
+- [x] iOS support
 - [x] Default to our own
-      [Castle Town PDS](https://castletown.darkworld.download) (definetly not a
-      deltarune reference)
+      [Castle Town PDS](https://castletown.darkworld.download)
 
-<img width="353" src="assets/images/initial_verification_announcement_2_copy.png"/>
+<img width="393" src="assets/images/readme_thing.png"/>
+
+All tested and works on my iPhone 15 running the iOS 26.4 Developer Beta, exept
+for:
+
+- Notifications (requires a paid apple dev account)
+- Image saving
+- Probably something else aswell.
 
 </details>
 

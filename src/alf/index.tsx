@@ -1,6 +1,8 @@
 import {createContext, useCallback, useContext, useMemo, useState} from 'react'
 import {type Theme, type ThemeName} from '@bsky.app/alf'
 
+import {useCrackSettings} from '#/state/preferences'
+import {selectScheme} from '#/alf/crack/customThemes'
 import {
   computeFontScaleMultiplier,
   getFontFamily,
@@ -65,6 +67,11 @@ export function ThemeProvider({
   children,
   theme: themeName,
 }: React.PropsWithChildren<{theme: ThemeName}>) {
+  const {customThemeScheme, customThemesEnabled} = useCrackSettings()
+  const currentScheme = useMemo(
+    () => (customThemesEnabled ? selectScheme(customThemeScheme) : themes),
+    [customThemeScheme, customThemesEnabled],
+  )
   const [fontScale, setFontScale] = useState<Alf['fonts']['scale']>(() =>
     getFontScale(),
   )
@@ -92,9 +99,9 @@ export function ThemeProvider({
 
   const value = useMemo<Alf>(
     () => ({
-      themes,
+      themes: currentScheme,
       themeName: themeName,
-      theme: themes[themeName],
+      theme: currentScheme[themeName],
       fonts: {
         scale: fontScale,
         scaleMultiplier: fontScaleMultiplier,
@@ -105,6 +112,7 @@ export function ThemeProvider({
       flags: {},
     }),
     [
+      currentScheme,
       themeName,
       fontScale,
       setFontScaleAndPersist,

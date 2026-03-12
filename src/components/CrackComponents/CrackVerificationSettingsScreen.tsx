@@ -2,8 +2,9 @@ import {Fragment, useMemo} from 'react'
 import {View} from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 import {type AppBskyActorDefs} from '@atproto/api'
-import {msg, Trans} from '@lingui/macro'
+import {msg} from '@lingui/core/macro'
 import {useLingui} from '@lingui/react'
+import {Trans} from '@lingui/react/macro'
 import {type NativeStackScreenProps} from '@react-navigation/native-stack'
 import {useQuery} from '@tanstack/react-query'
 import chunk from 'lodash.chunk'
@@ -11,6 +12,7 @@ import chunk from 'lodash.chunk'
 import {makeProfileLink} from '#/lib/routes/links'
 import {type CommonNavigatorParams} from '#/lib/routes/types'
 import {sanitizeHandle} from '#/lib/strings/handles'
+import {logger} from '#/logger'
 import {useAlterEgoProfileFields} from '#/state/crack/alter-ego'
 import {useCrackSettings, useCrackSettingsApi} from '#/state/preferences'
 import {
@@ -27,7 +29,7 @@ import {Button, ButtonText} from '#/components/Button'
 import {Divider} from '#/components/Divider'
 import * as Toggle from '#/components/forms/Toggle'
 import * as Layout from '#/components/Layout'
-import {InlineLinkText, Link} from '#/components/Link'
+import {Link} from '#/components/Link'
 import {Text} from '#/components/Typography'
 import {AgField} from '../crack/AgField'
 
@@ -60,9 +62,27 @@ export function CrackVerificationSettingsScreen({}: Props) {
     queryFn: async (): Promise<ProfileMap> => {
       const profilesByDid: ProfileMap = new Map()
       for (const didChunk of chunk(orderedVerifierDids, 25)) {
-        const res = await agent.getProfiles({actors: didChunk})
-        for (const profile of res.data.profiles) {
-          profilesByDid.set(profile.did, profile)
+        try {
+          const res = await agent.getProfiles({actors: didChunk})
+          for (const profile of res.data.profiles) {
+            profilesByDid.set(profile.did, profile)
+          }
+        } catch (error) {
+          logger.warn('Failed to fetch verifier profile batch', {
+            error,
+            dids: didChunk,
+          })
+          const fallback = await Promise.allSettled(
+            didChunk.map(async did => {
+              const res = await agent.getProfile({actor: did})
+              return res.data
+            }),
+          )
+          for (const result of fallback) {
+            if (result.status === 'fulfilled') {
+              profilesByDid.set(result.value.did, result.value)
+            }
+          }
         }
       }
       return profilesByDid
@@ -198,7 +218,7 @@ export function CrackVerificationSettingsScreen({}: Props) {
                 color="secondary"
                 onPress={onResetList}>
                 <ButtonText>
-                  <Trans>Reset to AppView defaults</Trans>
+                  <Trans>Reset</Trans>
                 </ButtonText>
               </Button>
             </View>
@@ -297,30 +317,8 @@ function TrustedVerifierRow({
                     {' · '}
                     <Text
                       style={{color: t.palette.negative_600, paddingRight: 3}}>
-                      <Trans>Negated by</Trans>
+                      <Trans>Negated</Trans>
                     </Text>
-                    {negatedBy.map((entry, i) => {
-                      const toNegator = makeProfileLink({
-                        did: entry.did,
-                        handle: entry.handleRaw ?? entry.did,
-                      })
-                      return (
-                        <Fragment key={entry.did}>
-                          {i > 0 && <Text>, </Text>}
-                          <InlineLinkText
-                            to={toNegator}
-                            label={entry.handle}
-                            style={{color: t.palette.primary_500}}>
-                            @
-                            <AgField
-                              field="handle"
-                              value={entry.handle}
-                              did={entry.did}
-                            />
-                          </InlineLinkText>
-                        </Fragment>
-                      )
-                    })}
                   </Text>
                 ) : (
                   <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>

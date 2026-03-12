@@ -10,6 +10,26 @@ import {type CrackSettings} from '#/state/preferences'
 
 const CRACK_SETTINGS_PREF_VERSION = 1
 
+const CUSTOM_THEME_SCHEMES = [
+  'witchsky',
+  'bluesky',
+  'blacksky',
+  'deer',
+  'zeppelin',
+  'kitty',
+  'reddwarf',
+  'catppuccin',
+  'evergarden',
+] as const
+
+function isCustomThemeScheme(
+  value: string,
+): value is Exclude<CrackSettings['customThemeScheme'], undefined> {
+  return CUSTOM_THEME_SCHEMES.includes(
+    value as (typeof CUSTOM_THEME_SCHEMES)[number],
+  )
+}
+
 export function createCrackSettingsPreference(
   settings: CrackSettings,
 ): CrackSettingsPreference {
@@ -26,6 +46,8 @@ export function createCrackSettingsPreference(
       renamePostsToSkeets: settings.renamePostsToSkeets,
       expandProfileMetrics: settings.expandProfileMetrics,
       alterEgoEnabled: settings.alterEgoEnabled,
+      customThemesEnabled: settings.customThemesEnabled,
+      customThemeScheme: settings.customThemeScheme,
       alterEgoUri: settings.alterEgoUri,
       alterEgoByDid: Object.entries(settings.alterEgoByDid ?? {}).map(
         ([did, uri]) => ({did, uri}),
@@ -34,6 +56,9 @@ export function createCrackSettingsPreference(
       statsigGateOverrides: Object.entries(
         settings.statsigGateOverrides ?? {},
       ).map(([gate, value]) => ({gate, value})),
+      atprotoFrickery: settings.atprotoFrickery,
+      atprotoRkeyGenerationDefault: settings.atprotoRkeyGenerationDefault,
+      atprotoRkeyPrefixDefault: settings.atprotoRkeyPrefixDefault,
     },
   }
 }
@@ -43,6 +68,11 @@ export function mergeCrackSettingsPreference(
   preference: CrackSettingsPreference,
 ): CrackSettings {
   const {settings: prefSettings} = preference
+  const customThemeScheme =
+    prefSettings.customThemeScheme &&
+    isCustomThemeScheme(prefSettings.customThemeScheme)
+      ? prefSettings.customThemeScheme
+      : settings.customThemeScheme
   const alterEgoByDid = prefSettings.alterEgoByDid
     ? Object.fromEntries(
         prefSettings.alterEgoByDid.map(entry => [entry.did, entry.uri]),
@@ -81,10 +111,20 @@ export function mergeCrackSettingsPreference(
     expandProfileMetrics:
       prefSettings.expandProfileMetrics ?? settings.expandProfileMetrics,
     alterEgoEnabled: prefSettings.alterEgoEnabled ?? settings.alterEgoEnabled,
+    customThemesEnabled:
+      prefSettings.customThemesEnabled ?? settings.customThemesEnabled,
+    customThemeScheme,
     alterEgoUri: prefSettings.alterEgoUri ?? settings.alterEgoUri,
     alterEgoByDid,
     alterEgoRecords,
     statsigGateOverrides,
+    atprotoFrickery: prefSettings.atprotoFrickery ?? settings.atprotoFrickery,
+    atprotoRkeyGenerationDefault:
+      prefSettings.atprotoRkeyGenerationDefault ??
+      settings.atprotoRkeyGenerationDefault,
+    atprotoRkeyPrefixDefault:
+      prefSettings.atprotoRkeyPrefixDefault ??
+      settings.atprotoRkeyPrefixDefault,
   }
 }
 

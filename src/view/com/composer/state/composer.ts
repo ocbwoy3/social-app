@@ -96,6 +96,8 @@ export type ThreadDraft = {
   posts: PostDraft[]
   postgate: AppBskyFeedPostgate.Record
   threadgate: ThreadgateAllowUISetting[]
+  atprotoRkeyGeneration: 'tid' | 'prefix'
+  atprotoRkeyPrefix: string
 }
 
 export type ComposerState = {
@@ -115,6 +117,11 @@ export type ComposerState = {
 export type ComposerAction =
   | {type: 'update_postgate'; postgate: AppBskyFeedPostgate.Record}
   | {type: 'update_threadgate'; threadgate: ThreadgateAllowUISetting[]}
+  | {
+      type: 'update_atproto_rkey_settings'
+      generation: 'tid' | 'prefix'
+      prefix: string
+    }
   | {
       type: 'update_post'
       postId: string
@@ -148,6 +155,8 @@ export type ComposerAction =
       initInteractionSettings:
         | AppBskyActorDefs.PostInteractionSettingsPref
         | undefined
+      initAtprotoRkeyGenerationDefault?: 'tid' | 'prefix'
+      initAtprotoRkeyPrefixDefault?: string
     }
   | {
       type: 'mark_saved'
@@ -178,6 +187,17 @@ export function composerReducer(
         thread: {
           ...state.thread,
           threadgate: action.threadgate,
+        },
+      }
+    }
+    case 'update_atproto_rkey_settings': {
+      return {
+        ...state,
+        isDirty: true,
+        thread: {
+          ...state.thread,
+          atprotoRkeyGeneration: action.generation,
+          atprotoRkeyPrefix: action.prefix,
         },
       }
     }
@@ -294,6 +314,8 @@ export function composerReducer(
             createdAt: new Date().toString(),
             allow: threadgateAllow,
           }),
+          atprotoRkeyGeneration: 'tid',
+          atprotoRkeyPrefix: '',
         },
       }
     }
@@ -304,6 +326,9 @@ export function composerReducer(
         initImageUris: [],
         initQuoteUri: undefined,
         initInteractionSettings: action.initInteractionSettings,
+        initAtprotoRkeyGenerationDefault:
+          action.initAtprotoRkeyGenerationDefault,
+        initAtprotoRkeyPrefixDefault: action.initAtprotoRkeyPrefixDefault,
       })
     }
     case 'mark_saved': {
@@ -572,6 +597,8 @@ export function createComposerState({
   initImageUris,
   initQuoteUri,
   initInteractionSettings,
+  initAtprotoRkeyGenerationDefault,
+  initAtprotoRkeyPrefixDefault,
 }: {
   initText: string | undefined
   initMention: string | undefined
@@ -580,6 +607,8 @@ export function createComposerState({
   initInteractionSettings:
     | AppBskyActorDefs.PostInteractionSettingsPref
     | undefined
+  initAtprotoRkeyGenerationDefault?: 'tid' | 'prefix'
+  initAtprotoRkeyPrefixDefault?: string
 }): ComposerState {
   let media: ImagesMedia | undefined
   if (initImageUris?.length) {
@@ -703,6 +732,8 @@ export function createComposerState({
         createdAt: new Date().toString(),
         allow: initInteractionSettings?.threadgateAllowRules,
       }),
+      atprotoRkeyGeneration: initAtprotoRkeyGenerationDefault ?? 'tid',
+      atprotoRkeyPrefix: initAtprotoRkeyPrefixDefault ?? '',
     },
   }
 }

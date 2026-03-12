@@ -49,6 +49,12 @@ lex.add({
               alterEgoEnabled: {
                 type: 'boolean',
               },
+              customThemesEnabled: {
+                type: 'boolean',
+              },
+              customThemeScheme: {
+                type: 'string',
+              },
               alterEgoUri: {
                 type: 'string',
                 format: 'at-uri',
@@ -119,6 +125,15 @@ lex.add({
                   },
                 },
               },
+              atprotoFrickery: {
+                type: 'boolean',
+              },
+              atprotoRkeyGenerationDefault: {
+                type: 'string',
+              },
+              atprotoRkeyPrefixDefault: {
+                type: 'string',
+              },
             },
           },
         },
@@ -143,6 +158,8 @@ export type CrackSettingsPreference = {
     renamePostsToSkeets?: boolean
     expandProfileMetrics?: boolean
     alterEgoEnabled?: boolean
+    customThemesEnabled?: boolean
+    customThemeScheme?: string
     alterEgoUri?: string
     alterEgoByDid?: Array<{did: string; uri: string}>
     alterEgoRecords?: Array<{
@@ -156,6 +173,9 @@ export type CrackSettingsPreference = {
       displayName?: string
     }>
     statsigGateOverrides?: Array<{gate: string; value: boolean}>
+    atprotoFrickery?: boolean
+    atprotoRkeyGenerationDefault?: 'tid' | 'prefix'
+    atprotoRkeyPrefixDefault?: string
   }
 }
 

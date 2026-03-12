@@ -29,7 +29,32 @@ function getTagName(node) {
   return reversedIdentifiers.reverse().join('.')
 }
 
+exports.meta = {
+  type: 'problem',
+  schema: [
+    {
+      type: 'object',
+      properties: {
+        impliedTextProps: {
+          type: 'array',
+          items: {type: 'string'},
+        },
+        impliedTextComponents: {
+          type: 'array',
+          items: {type: 'string'},
+        },
+        suggestedTextWrappers: {
+          type: 'object',
+          additionalProperties: {type: 'string'},
+        },
+      },
+      additionalProperties: false,
+    },
+  ],
+}
+
 exports.create = function create(context) {
+  const sourceCode = context.sourceCode ?? context.getSourceCode()
   const options = context.options[0] || {}
   const impliedTextProps = options.impliedTextProps ?? []
   const impliedTextComponents = options.impliedTextComponents ?? []
@@ -297,7 +322,7 @@ exports.create = function create(context) {
       }
     },
     ReturnStatement(node) {
-      let fnScope = context.getScope()
+      let fnScope = sourceCode.getScope(node)
       while (fnScope && fnScope.type !== 'function') {
         fnScope = fnScope.upper
       }

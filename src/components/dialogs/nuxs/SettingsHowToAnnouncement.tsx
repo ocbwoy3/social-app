@@ -97,7 +97,7 @@ export function SettingsHowToAnnouncement() {
                   maxWidth: 300,
                 },
               ]}>
-              <Trans>A New Experience</Trans>
+              <Trans>A new experience</Trans>
             </Text>
             <Text
               style={[

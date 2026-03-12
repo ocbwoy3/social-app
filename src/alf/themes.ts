@@ -4,6 +4,8 @@ import {
   DEFAULT_SUBDUED_PALETTE,
 } from '@bsky.app/alf'
 
+export type Palette = typeof DEFAULT_PALETTE
+
 const DEFAULT_THEMES = createThemes({
   defaultPalette: DEFAULT_PALETTE,
   subduedPalette: DEFAULT_SUBDUED_PALETTE,
