@@ -43,11 +43,11 @@ import {
   shouldShowKnownFollowers,
 } from '#/components/KnownFollowers'
 import {Link} from '#/components/Link'
+import {ProfileBadges} from '#/components/ProfileBadges'
 import * as Prompt from '#/components/Prompt'
 import {RichText} from '#/components/RichText'
 import * as Toast from '#/components/Toast'
 import {Text} from '#/components/Typography'
-import {VerificationCheckButton} from '#/components/verification/VerificationCheckButton'
 import {IS_IOS} from '#/env'
 import {useActorStatus} from '#/features/liveNow'
 import {GermButton} from '../components/GermButton'
@@ -148,37 +148,26 @@ let ProfileHeaderStandard = ({
                 value={profile.displayName}
                 did={profile.did}>
                 {displayNameValue => (
-                  <AgField
-                    field="handle"
-                    value={profile.handle}
-                    did={profile.did}>
-                    {handleValue => (
-                      <Text
-                        emoji
-                        testID="profileHeaderDisplayName"
-                        style={[
-                          t.atoms.text,
-                          gtMobile ? a.text_4xl : a.text_3xl,
-                          a.self_start,
-                          a.font_bold,
-                          a.leading_tight,
-                        ]}>
-                        {sanitizeDisplayName(
-                          displayNameValue || sanitizeHandle(handleValue),
-                          moderation.ui('displayName'),
-                        )}
-                        <View
-                          style={[a.pl_xs, {marginTop: platform({ios: 2})}]}>
-                          <VerificationCheckButton
-                            profile={profile}
-                            size="lg"
-                          />
-                        </View>
-                      </Text>
+                  <Text
+                    emoji
+                    testID="profileHeaderDisplayName"
+                    style={[
+                      t.atoms.text,
+                      gtMobile ? a.text_4xl : a.text_3xl,
+                      a.self_start,
+                      a.font_bold,
+                      a.leading_tight,
+                    ]}>
+                    {sanitizeDisplayName(
+                      displayNameValue || sanitizeHandle(profile.handle),
+                      moderation.ui('displayName'),
                     )}
-                  </AgField>
+                  </Text>
                 )}
               </AgField>
+              <View style={[a.pl_xs, {marginTop: platform({ios: 2})}]}>
+                <ProfileBadges profile={profile} size="lg" interactive />
+              </View>
             </View>
             <ProfileHeaderHandle profile={profile} />
           </View>

@@ -10,17 +10,15 @@ import {forceLTR} from '#/lib/strings/bidi'
 import {NON_BREAKING_SPACE} from '#/lib/strings/constants'
 import {sanitizeDisplayName} from '#/lib/strings/display-names'
 import {sanitizeHandle} from '#/lib/strings/handles'
-import {sanitizePronouns} from '#/lib/strings/pronouns'
 import {niceDate} from '#/lib/strings/time'
 import {useProfileShadow} from '#/state/cache/profile-shadow'
 import {unstableCacheProfileView} from '#/state/queries/profile'
-import {atoms as a, platform, useTheme, web} from '#/alf'
+import {atoms as a, useTheme, web} from '#/alf'
 import {AgField} from '#/components/crack/AgField'
 import {WebOnlyInlineLinkText} from '#/components/Link'
+import {ProfileBadges} from '#/components/ProfileBadges'
 import {ProfileHoverCard} from '#/components/ProfileHoverCard'
 import {Text} from '#/components/Typography'
-import {useSimpleVerificationState} from '#/components/verification'
-import {VerificationCheck} from '#/components/verification/VerificationCheck'
 import {IS_ANDROID} from '#/env'
 import {useActorStatus} from '#/features/liveNow'
 import {TimeElapsed} from './TimeElapsed'
@@ -57,7 +55,6 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
   }, [queryClient, author])
 
   const timestampLabel = niceDate(i18n, opts.timestamp)
-  const verification = useSimpleVerificationState({profile: author})
   const {isActive: live} = useActorStatus(author)
 
   const MaybeLinkText = opts.linkDisabled ? Text : WebOnlyInlineLinkText
@@ -115,55 +112,29 @@ let PostMeta = (opts: PostMetaOpts): React.ReactNode => {
                 </MaybeLinkText>
               )}
             </AgField>
-            {verification.showBadge && (
-              <View
-                style={[
-                  a.pl_2xs,
-                  a.self_center,
-                  {
-                    marginTop: platform({web: 0, ios: 0, android: -1}),
-                  },
-                ]}>
-                <VerificationCheck
-                  width={platform({android: 13, default: 12})}
-                  verifier={verification.role === 'verifier'}
-                />
-              </View>
-            )}
+            <ProfileBadges
+              profile={author}
+              size="sm"
+              style={[a.pl_2xs, a.self_center]}
+            />
             <AgField field="handle" value={handle} did={author.did}>
               {alterHandle => (
-                <AgField
-                  field="pronouns"
-                  value={
-                    (author as unknown as {pronouns?: string}).pronouns ?? ''
-                  }
-                  did={author.did}>
-                  {pronounsValue => {
-                    const pronouns = sanitizePronouns(pronounsValue, true)
-                    return (
-                      <MaybeLinkText
-                        emoji
-                        numberOfLines={1}
-                        to={profileLink}
-                        label={_(msg`View profile`)}
-                        disableMismatchWarning
-                        disableUnderline
-                        onPress={
-                          opts.linkDisabled ? undefined : onBeforePressAuthor
-                        }
-                        style={[
-                          a.text_md,
-                          t.atoms.text_contrast_medium,
-                          a.leading_tight,
-                          {flexShrink: 10},
-                        ]}>
-                        {NON_BREAKING_SPACE +
-                          sanitizeHandle(alterHandle, '@') +
-                          (pronouns ? `${NON_BREAKING_SPACE}${pronouns}` : '')}
-                      </MaybeLinkText>
-                    )
-                  }}
-                </AgField>
+                <MaybeLinkText
+                  emoji
+                  numberOfLines={1}
+                  to={profileLink}
+                  label={_(msg`View profile`)}
+                  disableMismatchWarning
+                  disableUnderline
+                  onPress={opts.linkDisabled ? undefined : onBeforePressAuthor}
+                  style={[
+                    a.text_md,
+                    t.atoms.text_contrast_medium,
+                    a.leading_tight,
+                    {flexShrink: 10},
+                  ]}>
+                  {NON_BREAKING_SPACE + sanitizeHandle(alterHandle, '@')}
+                </MaybeLinkText>
               )}
             </AgField>
           </View>

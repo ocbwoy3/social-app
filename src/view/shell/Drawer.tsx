@@ -1,4 +1,4 @@
-import React, {type ComponentProps, type JSX, memo} from 'react'
+import React, {type ComponentProps, type JSX, memo, useCallback} from 'react'
 import {Linking, ScrollView, TouchableOpacity, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {msg, plural} from '@lingui/core/macro'
@@ -54,9 +54,8 @@ import {
   UserCircle_Stroke2_Corner0_Rounded as UserCircle,
 } from '#/components/icons/UserCircle'
 import {InlineLinkText} from '#/components/Link'
+import {ProfileBadges} from '#/components/ProfileBadges'
 import {Text} from '#/components/Typography'
-import {useSimpleVerificationState} from '#/components/verification'
-import {VerificationCheck} from '#/components/verification/VerificationCheck'
 import {IS_WEB} from '#/env'
 import {useActorStatus} from '#/features/liveNow'
 
@@ -72,7 +71,6 @@ let DrawerProfileCard = ({
   const {_, i18n} = useLingui()
   const t = useTheme()
   const {data: profile} = useProfileQuery({did: account.did})
-  const verification = useSimpleVerificationState({profile})
   const {isActive: live} = useActorStatus(profile)
 
   return (
@@ -96,30 +94,13 @@ let DrawerProfileCard = ({
       </AgField>
       <View style={[a.gap_2xs]}>
         <View style={[a.flex_row, a.align_center, a.gap_xs, a.flex_1]}>
-          <AgField
-            field="displayName"
-            value={profile?.displayName || account.handle}
-            did={account.did}>
-            {displayNameValue => (
-              <Text
-                emoji
-                style={[a.font_bold, a.text_xl, a.mt_2xs, a.leading_tight]}
-                numberOfLines={1}>
-                {displayNameValue}
-              </Text>
-            )}
-          </AgField>
-          {verification.showBadge && (
-            <View
-              style={{
-                top: 0,
-              }}>
-              <VerificationCheck
-                width={16}
-                verifier={verification.role === 'verifier'}
-              />
-            </View>
-          )}
+          <Text
+            emoji
+            style={[a.font_bold, a.text_xl, a.mt_2xs, a.leading_tight]}
+            numberOfLines={1}>
+            {profile?.displayName || account.handle}
+          </Text>
+          {profile && <ProfileBadges profile={profile} size="lg" />}
         </View>
         <Text
           emoji
@@ -156,7 +137,7 @@ let DrawerProfileCard = ({
     </TouchableOpacity>
   )
 }
-DrawerProfileCard = React.memo(DrawerProfileCard)
+DrawerProfileCard = memo(DrawerProfileCard)
 export {DrawerProfileCard}
 
 let DrawerContent = ({}: React.PropsWithoutRef<{}>): React.ReactNode => {
@@ -178,7 +159,7 @@ let DrawerContent = ({}: React.PropsWithoutRef<{}>): React.ReactNode => {
   // events
   // =
 
-  const onPressTab = React.useCallback(
+  const onPressTab = useCallback(
     (tab: 'Home' | 'Search' | 'Messages' | 'Notifications' | 'MyProfile') => {
       const state = navigation.getState()
       setDrawerOpen(false)
@@ -219,48 +200,45 @@ let DrawerContent = ({}: React.PropsWithoutRef<{}>): React.ReactNode => {
     [navigation, setDrawerOpen, currentAccount],
   )
 
-  const onPressHome = React.useCallback(() => onPressTab('Home'), [onPressTab])
+  const onPressHome = useCallback(() => onPressTab('Home'), [onPressTab])
 
-  const onPressSearch = React.useCallback(
-    () => onPressTab('Search'),
-    [onPressTab],
-  )
+  const onPressSearch = useCallback(() => onPressTab('Search'), [onPressTab])
 
-  const onPressMessages = React.useCallback(
+  const onPressMessages = useCallback(
     () => onPressTab('Messages'),
     [onPressTab],
   )
 
-  const onPressNotifications = React.useCallback(
+  const onPressNotifications = useCallback(
     () => onPressTab('Notifications'),
     [onPressTab],
   )
 
-  const onPressProfile = React.useCallback(() => {
+  const onPressProfile = useCallback(() => {
     onPressTab('MyProfile')
   }, [onPressTab])
 
-  const onPressMyFeeds = React.useCallback(() => {
+  const onPressMyFeeds = useCallback(() => {
     navigation.navigate('Feeds')
     setDrawerOpen(false)
   }, [navigation, setDrawerOpen])
 
-  const onPressLists = React.useCallback(() => {
+  const onPressLists = useCallback(() => {
     navigation.navigate('Lists')
     setDrawerOpen(false)
   }, [navigation, setDrawerOpen])
 
-  const onPressBookmarks = React.useCallback(() => {
+  const onPressBookmarks = useCallback(() => {
     navigation.navigate('Bookmarks')
     setDrawerOpen(false)
   }, [navigation, setDrawerOpen])
 
-  const onPressSettings = React.useCallback(() => {
+  const onPressSettings = useCallback(() => {
     navigation.navigate('Settings')
     setDrawerOpen(false)
   }, [navigation, setDrawerOpen])
 
-  const onPressFeedback = React.useCallback(() => {
+  const onPressFeedback = useCallback(() => {
     Linking.openURL(
       FEEDBACK_FORM_URL({
         email: currentAccount?.email,
@@ -269,7 +247,7 @@ let DrawerContent = ({}: React.PropsWithoutRef<{}>): React.ReactNode => {
     )
   }, [currentAccount])
 
-  const onPressHelp = React.useCallback(() => {
+  const onPressHelp = useCallback(() => {
     Linking.openURL(HELP_DESK_URL)
   }, [])
 
@@ -401,7 +379,7 @@ let DrawerFooter = ({
     </View>
   )
 }
-DrawerFooter = React.memo(DrawerFooter)
+DrawerFooter = memo(DrawerFooter)
 
 interface MenuItemProps extends ComponentProps<typeof PressableScale> {
   icon: JSX.Element
@@ -434,7 +412,7 @@ let SearchMenuItem = ({
     />
   )
 }
-SearchMenuItem = React.memo(SearchMenuItem)
+SearchMenuItem = memo(SearchMenuItem)
 
 let HomeMenuItem = ({
   isActive,
@@ -460,7 +438,7 @@ let HomeMenuItem = ({
     />
   )
 }
-HomeMenuItem = React.memo(HomeMenuItem)
+HomeMenuItem = memo(HomeMenuItem)
 
 let ChatMenuItem = ({
   isActive,
@@ -486,7 +464,7 @@ let ChatMenuItem = ({
     />
   )
 }
-ChatMenuItem = React.memo(ChatMenuItem)
+ChatMenuItem = memo(ChatMenuItem)
 
 let NotificationsMenuItem = ({
   isActive,
@@ -524,7 +502,7 @@ let NotificationsMenuItem = ({
     />
   )
 }
-NotificationsMenuItem = React.memo(NotificationsMenuItem)
+NotificationsMenuItem = memo(NotificationsMenuItem)
 
 let FeedsMenuItem = ({
   isActive,
@@ -550,7 +528,7 @@ let FeedsMenuItem = ({
     />
   )
 }
-FeedsMenuItem = React.memo(FeedsMenuItem)
+FeedsMenuItem = memo(FeedsMenuItem)
 
 let ListsMenuItem = ({onPress}: {onPress: () => void}): React.ReactNode => {
   const {_} = useLingui()
@@ -564,7 +542,7 @@ let ListsMenuItem = ({onPress}: {onPress: () => void}): React.ReactNode => {
     />
   )
 }
-ListsMenuItem = React.memo(ListsMenuItem)
+ListsMenuItem = memo(ListsMenuItem)
 
 let BookmarksMenuItem = ({
   isActive,
@@ -590,7 +568,7 @@ let BookmarksMenuItem = ({
     />
   )
 }
-BookmarksMenuItem = React.memo(BookmarksMenuItem)
+BookmarksMenuItem = memo(BookmarksMenuItem)
 
 let ProfileMenuItem = ({
   isActive,
@@ -615,7 +593,7 @@ let ProfileMenuItem = ({
     />
   )
 }
-ProfileMenuItem = React.memo(ProfileMenuItem)
+ProfileMenuItem = memo(ProfileMenuItem)
 
 let SettingsMenuItem = ({onPress}: {onPress: () => void}): React.ReactNode => {
   const {_} = useLingui()
@@ -628,7 +606,7 @@ let SettingsMenuItem = ({onPress}: {onPress: () => void}): React.ReactNode => {
     />
   )
 }
-SettingsMenuItem = React.memo(SettingsMenuItem)
+SettingsMenuItem = memo(SettingsMenuItem)
 
 function MenuItem({icon, label, count, bold, onPress}: MenuItemProps) {
   const t = useTheme()

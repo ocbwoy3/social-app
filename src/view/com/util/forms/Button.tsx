@@ -1,4 +1,4 @@
-import React from 'react'
+import {useCallback, useState} from 'react'
 import {
   ActivityIndicator,
   type GestureResponderEvent,
@@ -148,19 +148,21 @@ export function Button({
     },
   )
 
-  const [isLoading, setIsLoading] = React.useState(false)
-  const onPressWrapped = React.useCallback(
+  const [isLoading, setIsLoading] = useState(false)
+  const onPressWrapped = useCallback(
     async (event: GestureResponderEvent) => {
       event.stopPropagation()
       event.preventDefault()
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       withLoading && setIsLoading(true)
       await onPress?.(event)
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       withLoading && setIsLoading(false)
     },
     [onPress, withLoading],
   )
 
-  const getStyle = React.useCallback(
+  const getStyle = useCallback(
     (state: PressableStateCallbackType) => {
       const arr = [typeOuterStyle, styles.outer, style]
       if (state.pressed) {
@@ -173,7 +175,7 @@ export function Button({
     [typeOuterStyle, style],
   )
 
-  const renderChildern = React.useCallback(() => {
+  const renderChildern = useCallback(() => {
     if (!label) {
       return children
     }

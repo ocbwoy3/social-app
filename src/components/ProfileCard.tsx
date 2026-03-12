@@ -43,10 +43,9 @@ import {Check_Stroke2_Corner0_Rounded as Check} from '#/components/icons/Check'
 import {PlusLarge_Stroke2_Corner0_Rounded as Plus} from '#/components/icons/Plus'
 import {Link as InternalLink, type LinkProps} from '#/components/Link'
 import * as Pills from '#/components/Pills'
+import {ProfileBadges} from '#/components/ProfileBadges'
 import {RichText} from '#/components/RichText'
 import {Text} from '#/components/Typography'
-import {useSimpleVerificationState} from '#/components/verification'
-import {VerificationCheck} from '#/components/verification/VerificationCheck'
 import {type Metrics} from '#/analytics'
 import {useActorStatus} from '#/features/liveNow'
 import type * as bsky from '#/types/bsky'
@@ -255,7 +254,6 @@ function InlineNameAndHandle({
   moderationOpts: ModerationOpts
 }) {
   const t = useTheme()
-  const verification = useSimpleVerificationState({profile})
   const moderation = moderateProfile(profile, moderationOpts)
   return (
     <View style={[a.flex_row, a.align_end, a.flex_shrink]}>
@@ -284,19 +282,15 @@ function InlineNameAndHandle({
                     numberOfLines={1}>
                     {forceLTR(name)}
                   </Text>
-                  {verification.showBadge && (
-                    <View
-                      style={[
-                        a.pl_2xs,
-                        a.self_center,
-                        {marginTop: platform({default: 0, android: -1})},
-                      ]}>
-                      <VerificationCheck
-                        width={platform({android: 13, default: 12})}
-                        verifier={verification.role === 'verifier'}
-                      />
-                    </View>
-                  )}
+                  <ProfileBadges
+                    profile={profile}
+                    size="md"
+                    style={[
+                      a.pl_2xs,
+                      a.self_center,
+                      {marginTop: platform({default: 0, android: -1})},
+                    ]}
+                  />
                   <Text
                     emoji
                     style={[
@@ -329,49 +323,26 @@ export function Name({
   textStyle?: StyleProp<TextStyle>
 }) {
   const moderation = moderateProfile(profile, moderationOpts)
-  const verification = useSimpleVerificationState({profile})
+  const name = sanitizeDisplayName(
+    profile.displayName || sanitizeHandle(profile.handle),
+    moderation.ui('displayName'),
+  )
   return (
     <View style={[a.flex_row, a.align_center, a.max_w_full, style]}>
-      <AgField
-        field="displayName"
-        value={profile.displayName}
-        did={profile.did}>
-        {displayNameValue => (
-          <AgField field="handle" value={profile.handle} did={profile.did}>
-            {handleValue => {
-              const name = sanitizeDisplayName(
-                displayNameValue || sanitizeHandle(handleValue),
-                moderation.ui('displayName'),
-              )
-              return (
-                <>
-                  <Text
-                    emoji
-                    style={[
-                      a.text_md,
-                      a.font_semi_bold,
-                      a.leading_snug,
-                      a.self_start,
-                      a.flex_shrink,
-                      textStyle,
-                    ]}
-                    numberOfLines={1}>
-                    {name}
-                  </Text>
-                  {verification.showBadge && (
-                    <View style={[a.pl_xs]}>
-                      <VerificationCheck
-                        width={14}
-                        verifier={verification.role === 'verifier'}
-                      />
-                    </View>
-                  )}
-                </>
-              )
-            }}
-          </AgField>
-        )}
-      </AgField>
+      <Text
+        emoji
+        style={[
+          a.text_md,
+          a.font_semi_bold,
+          a.leading_snug,
+          a.self_start,
+          a.flex_shrink,
+          textStyle,
+        ]}
+        numberOfLines={1}>
+        {name}
+      </Text>
+      <ProfileBadges profile={profile} size="md" style={[a.pl_xs]} />
     </View>
   )
 }

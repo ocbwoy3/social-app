@@ -44,6 +44,7 @@ export default tseslint.config(
       '*.e2e.tsx',
       '.eslintrc.js',
       'eslint.config.mjs',
+      '.jscodeshift/**',
     ],
   },
 

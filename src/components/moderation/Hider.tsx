@@ -1,4 +1,4 @@
-import React from 'react'
+import {createContext, useContext, useState} from 'react'
 import {type ModerationUI} from '@atproto/api'
 
 import {
@@ -22,10 +22,10 @@ type Context = {
   }
 }
 
-const Context = React.createContext<Context>({} as Context)
+const Context = createContext<Context>({} as Context)
 Context.displayName = 'HiderContext'
 
-export const useHider = () => React.useContext(Context)
+export const useHider = () => useContext(Context)
 
 export function Outer({
   modui,
@@ -39,7 +39,7 @@ export function Outer({
 }>) {
   const control = useModerationDetailsDialogControl()
   const blur = modui?.blurs[0]
-  const [isContentVisible, setIsContentVisible] = React.useState(
+  const [isContentVisible, setIsContentVisible] = useState(
     isContentVisibleInitialState || !blur,
   )
   const info = useModerationCauseDescription(blur)

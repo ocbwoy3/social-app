@@ -1,4 +1,4 @@
-import React from 'react'
+import {useRef} from 'react'
 import {View} from 'react-native'
 import {
   type AppBskyActorDefs,
@@ -47,9 +47,7 @@ export function KnownFollowers({
   minimal?: boolean
   showIfEmpty?: boolean
 }) {
-  const cache = React.useRef<Map<string, AppBskyActorDefs.KnownFollowers>>(
-    new Map(),
-  )
+  const cache = useRef<Map<string, AppBskyActorDefs.KnownFollowers>>(new Map())
 
   /*
    * Results for `knownFollowers` are not sorted consistently, so when
@@ -194,7 +192,7 @@ function KnownFollowersInner({
             numberOfLines={2}>
             {slice.length >= 2 ? (
               // 2-n followers, including blocks
-              serverCount > 2 ? (
+              serverCount > 2 ? ( // only 2
                 <Trans>
                   Followed by{' '}
                   <Text emoji key={slice[0].profile.did} style={textStyle}>
@@ -210,7 +208,7 @@ function KnownFollowersInner({
                     one="# other"
                     other="# others"
                   />
-                </Trans> // only 2
+                </Trans>
               ) : (
                 <Trans>
                   Followed by{' '}
