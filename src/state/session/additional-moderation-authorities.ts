@@ -82,7 +82,7 @@ export function configureAdditionalModerationAuthorities() {
     logger.info(`no geolocation, cannot apply mod authorities`)
   }
 
-  if (__DEV__) {
+  if (persisted.get('crackSettings')?.removeAppLabelers === true || __DEV__) {
     additionalLabelers = []
   }
 

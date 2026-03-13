@@ -1,9 +1,44 @@
-# Bluesky on Crack
-
-Welcome friends! This is the codebase for a fork of the Bluesky Social app -
-Bluesky on Crack.
+# TV Time
 
 ### _**Third-party fork by [@kris.darkworld.download](https://bsky.app/profile/did:plc:s7cesz7cr6ybltaryy4meb6y).**_
+
+Welcome friends! This is the codebase for TV Time - a fork of the Bluesky Social
+app.
+
+We are over 151+ commits ahead of `bluesky-social/social-app:main` on GitHub.
+ATProto Based 🤙🤟
+
+Our main repo is on
+**[Tangled](https://tangled.sh/did:plc:s7cesz7cr6ybltaryy4meb6y/BlueskyOnCrack)**.
+
+<details>
+<summary>**HOW TO INSTALL (iOS ONLY)**</summary>
+
+This app was tested on:
+
+- iPhone 15, iOS 26.4 Developer Beta;
+- ~~iPhone 7, iOS 15.8.1~~
+
+Push Notifications and photo saving MAY NOT WORK!!!
+
+1. Download the iOS build from GitHub CI _(latest run -> artifacts -> .ipa)_:
+
+- **iOS App:**
+  https://github.com/OCbwoy3-Chan/social-app/actions/workflows/build-ios-unsigned.yaml
+- **Expo Dev Build (for development only!!):**
+  https://github.com/OCbwoy3-Chan/social-app/actions/workflows/build-ios-dev-client-unsigned.yaml
+
+2. Install and set up Custom DNS:
+
+- https://sideloading.vercel.app/guide
+- https://sideloading.vercel.app/tips
+
+3. Install either Esign or Ksign from Khoindvn. If you're on iOS 16+, you may
+   need to reboot to install profiles or apps.
+
+4. ???
+
+</details>
 
 Here's a list of crack features, consolidated into each category:
 
@@ -51,10 +86,14 @@ Advanced:
 
 <img width="393" src="assets/images/readme_thing.png"/>
 
+PRs merged in early:
+
 All tested and works on my iPhone 15 running the iOS 26.4 Developer Beta, exept
 for:
 
-- Notifications (requires a paid apple dev account)
+What doesn't work:
+
+- Push notifications
 - Image saving
 - Probably something else aswell.
 
