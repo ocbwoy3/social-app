@@ -85,6 +85,8 @@ let ProfileHeaderStandard = ({
   const [, queueUnblock] = useProfileBlockMutationQueue(profile)
   const unblockPromptControl = Prompt.usePromptControl()
   const [showSuggestedFollows, setShowSuggestedFollows] = useState(false)
+  const [hasSeenAllSuggestedFollows, setHasSeenAllSuggestedFollows] =
+    useState(false)
   const isBlockedUser =
     profile.viewer?.blocking ||
     profile.viewer?.blockedBy ||
@@ -99,12 +101,18 @@ let ProfileHeaderStandard = ({
     try {
       await queueUnblock()
       Toast.show(_(msg({message: 'Account unblocked', context: 'toast'})))
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as Error
       if (e?.name !== 'AbortError') {
         logger.error('Failed to unblock account', {message: e})
         Toast.show(_(msg`There was an issue! ${e.toString()}`), {type: 'error'})
       }
     }
+  }
+
+  const onRequestHide = () => {
+    setHasSeenAllSuggestedFollows(true)
+    setShowSuggestedFollows(false)
   }
 
   const isMe = currentAccount?.did === profile.did
@@ -263,7 +271,9 @@ let ProfileHeaderStandard = ({
           description={_(
             msg`The account will be able to interact with you after unblocking.`,
           )}
-          onConfirm={unblockAccount}
+          onConfirm={() => {
+            void unblockAccount()
+          }}
           confirmButtonCta={
             profile.viewer?.blocking ? _(msg`Unblock`) : _(msg`Block`)
           }
@@ -272,8 +282,9 @@ let ProfileHeaderStandard = ({
       </ProfileHeaderShell>
 
       <ProfileHeaderSuggestedFollows
-        isExpanded={showSuggestedFollows}
+        isExpanded={!hasSeenAllSuggestedFollows && showSuggestedFollows}
         actorDid={profile.did}
+        onRequestHide={onRequestHide}
       />
     </>
   )
@@ -366,7 +377,8 @@ export function HeaderStandardButtons({
             )}`,
           ),
         )
-      } catch (e: any) {
+      } catch (err) {
+        const e = err as Error
         if (e?.name !== 'AbortError') {
           logger.error('Failed to follow', {message: String(e)})
           Toast.show(_(msg`There was an issue! ${e.toString()}`), {
@@ -392,7 +404,8 @@ export function HeaderStandardButtons({
           ),
           {type: 'default'},
         )
-      } catch (e: any) {
+      } catch (err) {
+        const e = err as Error
         if (e?.name !== 'AbortError') {
           logger.error('Failed to unfollow', {message: String(e)})
           Toast.show(_(msg`There was an issue! ${e.toString()}`), {
@@ -407,7 +420,8 @@ export function HeaderStandardButtons({
     try {
       await queueUnblock()
       Toast.show(_(msg({message: 'Account unblocked', context: 'toast'})))
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as Error
       if (e?.name !== 'AbortError') {
         logger.error('Failed to unblock account', {message: e})
         Toast.show(_(msg`There was an issue! ${e.toString()}`), {type: 'error'})
@@ -512,7 +526,9 @@ export function HeaderStandardButtons({
         description={_(
           msg`The account will be able to interact with you after unblocking.`,
         )}
-        onConfirm={unblockAccount}
+        onConfirm={() => {
+          void unblockAccount()
+        }}
         confirmButtonCta={_(msg`Unblock`)}
         confirmButtonColor="negative"
       />
