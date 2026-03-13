@@ -49,7 +49,7 @@ import {GlobalLabelPreference} from '#/components/moderation/LabelPreference'
 import * as Toast from '#/components/Toast'
 import {Text} from '#/components/Typography'
 import {useAgeAssurance} from '#/ageAssurance'
-import {IS_IOS} from '#/env'
+// import { IS_IOS } from '#/env'
 
 function ErrorState({error}: {error: string}) {
   const t = useTheme()
@@ -212,8 +212,9 @@ export function ModerationScreenInner({
     (optimisticAdultContent && optimisticAdultContent.enabled) ||
     (!optimisticAdultContent && preferences.moderationPrefs.adultContentEnabled)
   )
-  const adultContentUIDisabledOnIOS = IS_IOS && !adultContentEnabled
-  let adultContentUIDisabled = adultContentUIDisabledOnIOS
+  const adultContentUIDisabledOnIOS = false // IS_IOS && !adultContentEnabled
+  let adultContentUIDisabled = false // adultContentUIDisabledOnIOS
+  //  CRACK BYPASS
 
   if (aa.flags.adultContentDisabled) {
     adultContentEnabled = false

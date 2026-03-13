@@ -1,6 +1,5 @@
-import {type AppBskyActorDefs, type AppBskyLabelerDefs} from '@atproto/api'
+import {type AppBskyLabelerDefs} from '@atproto/api'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import chunk from 'lodash.chunk'
 import {z} from 'zod'
 
 import {MAX_LABELERS} from '#/lib/constants'
@@ -34,6 +33,91 @@ const persistedLabelersDetailedInfoQueryKey = (dids: string[]) => [
   'labelers-detailed-info',
   dids,
 ]
+
+function findCachedLabelerInfo(
+  queryClient: ReturnType<typeof useQueryClient>,
+  did: string,
+) {
+  const direct =
+    queryClient.getQueryData<AppBskyLabelerDefs.LabelerViewDetailed>(
+      labelerInfoQueryKey(did),
+    )
+  if (direct) {
+    return direct
+  }
+
+  const detailedQueryDatas = queryClient.getQueriesData<
+    AppBskyLabelerDefs.LabelerViewDetailed[]
+  >({
+    queryKey: [PERSISTED_QUERY_ROOT, 'labelers-detailed-info'],
+  })
+  for (const [_queryKey, queryData] of detailedQueryDatas) {
+    const labeler = queryData?.find(view => view.creator.did === did)
+    if (labeler) {
+      queryClient.setQueryData(labelerInfoQueryKey(did), labeler)
+      return labeler
+    }
+  }
+}
+
+function findCachedLabelersCoverage(
+  queryClient: ReturnType<typeof useQueryClient>,
+  dids: string[],
+) {
+  if (!dids.length) {
+    return new Set<string>()
+  }
+
+  const detailedQueryDatas = queryClient.getQueriesData<
+    AppBskyLabelerDefs.LabelerViewDetailed[]
+  >({
+    queryKey: [PERSISTED_QUERY_ROOT, 'labelers-detailed-info'],
+  })
+
+  for (const [queryKey, queryData] of detailedQueryDatas) {
+    if (!queryData) {
+      continue
+    }
+
+    const requestedDids = Array.isArray(queryKey) ? queryKey[2] : undefined
+    if (!Array.isArray(requestedDids)) {
+      continue
+    }
+
+    if (!dids.every(did => requestedDids.includes(did))) {
+      continue
+    }
+
+    return new Set(queryData.map(view => view.creator.did))
+  }
+}
+
+async function getOrFetchLabelerInfo({
+  agent,
+  queryClient,
+  did,
+}: {
+  agent: ReturnType<typeof useAgent>
+  queryClient: ReturnType<typeof useQueryClient>
+  did: string
+}) {
+  const cached = findCachedLabelerInfo(queryClient, did)
+  if (cached) {
+    return cached
+  }
+
+  const res = await agent.app.bsky.labeler.getServices({
+    dids: [did],
+    detailed: true,
+  })
+  const labeler = res.data.views[0] as
+    | AppBskyLabelerDefs.LabelerViewDetailed
+    | undefined
+  if (labeler) {
+    queryClient.setQueryData(labelerInfoQueryKey(did), labeler)
+  }
+  return labeler
+}
 
 export function useLabelerInfoQuery({
   did,
@@ -70,6 +154,7 @@ export function useLabelersInfoQuery({dids}: {dids: string[]}) {
 
 export function useLabelersDetailedInfoQuery({dids}: {dids: string[]}) {
   const agent = useAgent()
+  const queryClient = useQueryClient()
   return useQuery({
     enabled: !!dids.length,
     queryKey: persistedLabelersDetailedInfoQueryKey(dids),
@@ -80,7 +165,11 @@ export function useLabelersDetailedInfoQuery({dids}: {dids: string[]}) {
         dids,
         detailed: true,
       })
-      return res.data.views as AppBskyLabelerDefs.LabelerViewDetailed[]
+      const views = res.data.views as AppBskyLabelerDefs.LabelerViewDetailed[]
+      for (const view of views) {
+        queryClient.setQueryData(labelerInfoQueryKey(view.creator.did), view)
+      }
+      return views
     },
   })
 }
@@ -131,36 +220,23 @@ export function useLabelerSubscriptionMutation() {
       const labelerDids = (
         preferences.data?.moderationPrefs?.labelers ?? []
       ).map(l => l.did)
-      const invalidLabelers: string[] = []
-      if (labelerDids.length) {
-        const profilesByDid = new Map<
-          string,
-          AppBskyActorDefs.ProfileViewDetailed
-        >()
-        for (const didChunk of chunk(labelerDids, 25)) {
-          const profiles = await agent.getProfiles({actors: didChunk})
-          for (const profile of profiles.data?.profiles ?? []) {
-            profilesByDid.set(profile.did, profile)
-          }
-        }
-        for (const did of labelerDids) {
-          const exists = profilesByDid.get(did)
-          if (exists) {
-            // profile came back but it's not a valid labeler
-            if (exists.associated && !exists.associated.labeler) {
-              invalidLabelers.push(did)
-            }
-          } else {
-            // no response came back, might be deactivated or takendown
-            invalidLabelers.push(did)
-          }
-        }
-      }
+      const cachedLabelerCoverage = findCachedLabelersCoverage(
+        queryClient,
+        labelerDids,
+      )
+      const invalidLabelers = cachedLabelerCoverage
+        ? labelerDids.filter(did => !cachedLabelerCoverage.has(did))
+        : []
       if (invalidLabelers.length) {
         await Promise.all(invalidLabelers.map(did => agent.removeLabeler(did)))
       }
 
       if (subscribe) {
+        const labeler = await getOrFetchLabelerInfo({agent, queryClient, did})
+        if (!labeler) {
+          throw new Error('LABELER_NOT_FOUND')
+        }
+
         const labelerCount = labelerDids.length - invalidLabelers.length
         if (!allowUncapped && labelerCount >= MAX_LABELERS) {
           throw new Error('MAX_LABELERS')

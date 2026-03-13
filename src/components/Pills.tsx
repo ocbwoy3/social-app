@@ -52,6 +52,7 @@ export type LabelProps = {
   cause: AppModerationCause
   disableDetailsDialog?: boolean
   noBg?: boolean
+  textOverride?: string
 } & CommonProps
 
 export function Label({
@@ -59,6 +60,7 @@ export function Label({
   size = 'sm',
   disableDetailsDialog,
   noBg,
+  textOverride,
 }: LabelProps) {
   const t = useTheme()
   const control = useModerationDetailsDialogControl()
@@ -66,6 +68,8 @@ export function Label({
   const isLabeler = Boolean(desc.sourceType && desc.sourceDid)
   const isBlueskyLabel =
     desc.sourceType === 'labeler' && desc.sourceDid === BSKY_LABELER_DID
+
+  const shouldNotShowName = textOverride === ''
 
   const {outer, avi, text} = useMemo(() => {
     switch (size) {
@@ -105,7 +109,7 @@ export function Label({
     <>
       <Button
         disabled={disableDetailsDialog}
-        label={desc.name}
+        label={textOverride || desc.name}
         onPress={e => {
           e.preventDefault()
           e.stopPropagation()
@@ -129,17 +133,19 @@ export function Label({
               <UserAvatar avatar={desc.sourceAvi} type="user" size={avi} />
             )}
 
-            <Text
-              emoji
-              style={[
-                text,
-                a.font_semi_bold,
-                a.leading_tight,
-                t.atoms.text_contrast_medium,
-                {paddingRight: 3},
-              ]}>
-              {desc.name}
-            </Text>
+            {!shouldNotShowName && (
+              <Text
+                emoji
+                style={[
+                  text,
+                  a.font_semi_bold,
+                  a.leading_tight,
+                  t.atoms.text_contrast_medium,
+                  {paddingRight: 3},
+                ]}>
+                {textOverride || desc.name}
+              </Text>
+            )}
           </View>
         )}
       </Button>

@@ -473,6 +473,7 @@ let PostContent = ({
         modui={moderation.ui('contentList')}
         style={[a.pb_xs]}
         additionalCauses={additionalPostAlerts}
+        accountLabels={postAuthor.labels}
       />
       {richText.text ? (
         <View style={[a.mb_2xs]}>

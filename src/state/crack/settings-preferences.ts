@@ -43,6 +43,7 @@ export function createCrackSettingsPreference(
       uncapLabelerLimit: settings.uncapLabelerLimit,
       hijackHideLabels: settings.hijackHideLabels,
       hideSuggestedAccounts: settings.hideSuggestedAccounts,
+      consolidateAccountLabels: settings.consolidateAccountLabels,
       renamePostsToSkeets: settings.renamePostsToSkeets,
       expandProfileMetrics: settings.expandProfileMetrics,
       alterEgoEnabled: settings.alterEgoEnabled,
@@ -106,6 +107,9 @@ export function mergeCrackSettingsPreference(
       prefSettings.hijackHideLabels ?? settings.hijackHideLabels,
     hideSuggestedAccounts:
       prefSettings.hideSuggestedAccounts ?? settings.hideSuggestedAccounts,
+    consolidateAccountLabels:
+      prefSettings.consolidateAccountLabels ??
+      settings.consolidateAccountLabels,
     renamePostsToSkeets:
       prefSettings.renamePostsToSkeets ?? settings.renamePostsToSkeets,
     expandProfileMetrics:

@@ -199,6 +199,7 @@ function PostInner({
             <PostAlerts
               modui={moderation.ui('contentView')}
               style={[a.pb_xs]}
+              accountLabels={post.author.labels}
             />
             {richText.text ? (
               <View style={[a.mb_2xs]}>
