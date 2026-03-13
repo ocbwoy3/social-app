@@ -31,6 +31,7 @@ import {
   useCrackSettings,
   useCrackSettingsApi,
 } from '#/state/preferences'
+import {type CrackSettingsPickerItem} from '#/state/preferences/crack-settings-api'
 import {type Nux, nuxNames} from '#/state/queries/nuxs/definitions'
 import {atoms as a, useBreakpoints, useTheme} from '#/alf'
 import {Button} from '#/components/Button'
@@ -63,6 +64,10 @@ export function CrackSettingsScreen({}: Props) {
   const navigation = useNavigation<NavigationProp>()
 
   const onToggleSetting = (key: keyof CrackSettings, value: boolean) => {
+    update({[key]: value} as Partial<CrackSettings>)
+  }
+
+  const onPickerChange = (key: keyof CrackSettings, value: string) => {
     update({[key]: value} as Partial<CrackSettings>)
   }
 
@@ -129,7 +134,13 @@ export function CrackSettingsScreen({}: Props) {
                   ) : (
                     visibleItems.map((item, itemIndex) => (
                       <Fragment
-                        key={item.type === 'toggle' ? item.key : item.id}>
+                        key={
+                          item.type === 'button'
+                            ? item.id
+                            : item.type === 'toggle'
+                              ? item.key
+                              : item.key
+                        }>
                         {itemIndex > 0 && <Divider />}
                         {item.type === 'toggle' ? (
                           <ToggleRow
@@ -140,6 +151,16 @@ export function CrackSettingsScreen({}: Props) {
                             //@ts-expect-error
                             value={settings[item.key]!}
                             onChange={next => onToggleSetting(item.key, next)}
+                          />
+                        ) : item.type === 'picker' ? (
+                          <PickerRow
+                            title={item.label}
+                            description={item.description}
+                            name={item.key}
+                            //@ts-expect-error
+                            value={settings[item.key]!}
+                            options={item.options}
+                            onChange={next => onPickerChange(item.key, next)}
                           />
                         ) : (
                           <ActionRow
@@ -183,7 +204,9 @@ export function CrackSettingsScreen({}: Props) {
   )
 }
 
-function getItemIcon(item: CrackSettingsSection['items'][number]) {
+function getItemIcon(
+  item: CrackSettingsSection['items'][number],
+): ComponentType<SVGIconProps> {
   if (item.type === 'toggle') {
     if (item.key === 'kawaiiMode') return SparkleIcon
     if (item.key === 'customVerificationsEnabled') return VerifierCheckIcon
@@ -193,9 +216,64 @@ function getItemIcon(item: CrackSettingsSection['items'][number]) {
 
     return FilterIcon
   }
-  if (item.id === 'openVerificationSettings') return VerifierCheckIcon
-  if (item.id === 'openAlterEgo') return SparkleIcon
-  return WindowIcon
+  if (item.type === 'button') {
+    if (item.id === 'openVerificationSettings') return VerifierCheckIcon
+    if (item.id === 'openAlterEgo') return SparkleIcon
+    return WindowIcon
+  }
+  return FilterIcon
+}
+
+function PickerRow({
+  title,
+  description,
+  name,
+  value,
+  options,
+  onChange,
+}: {
+  title: string
+  description: string
+  name: string
+  value: string
+  options: CrackSettingsPickerItem['options']
+  onChange: (next: string) => void
+}) {
+  const t = useTheme()
+  const {_} = useLingui()
+
+  return (
+    <View style={[a.w_full, a.p_lg, a.gap_sm]}>
+      <Text style={[a.text_md, a.font_semi_bold]}>{title}</Text>
+      {description && (
+        <Text style={[a.text_sm, t.atoms.text_contrast_medium]}>
+          {description}
+        </Text>
+      )}
+      <Toggle.Group
+        label={_(msg`Choose an option for ${name}`)}
+        type="radio"
+        values={[value]}
+        onChange={vals => onChange(vals[0])}>
+        <View style={[a.flex_row, a.gap_sm]}>
+          {options.map(option => (
+            <Toggle.Item
+              key={option.value}
+              name={option.value}
+              label={option.label}
+              style={[a.flex_1]}>
+              {({selected}) => (
+                <Toggle.Panel active={selected}>
+                  <Toggle.Radio />
+                  <Toggle.PanelText>{option.label}</Toggle.PanelText>
+                </Toggle.Panel>
+              )}
+            </Toggle.Item>
+          ))}
+        </View>
+      </Toggle.Group>
+    </View>
+  )
 }
 
 function ToggleRow({

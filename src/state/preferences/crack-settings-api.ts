@@ -1,3 +1,4 @@
+import * as persisted from '#/state/persisted'
 import {type Schema} from '#/state/persisted/schema'
 import {IS_WEB} from '#/env'
 
@@ -13,6 +14,7 @@ export const crackSettingsDefaults: CrackSettings = {
   hijackHideLabels: false,
   hideSuggestedAccounts: false,
   consolidateAccountLabels: false,
+  consolidationMethod: 'total',
   renamePostsToSkeets: false,
   expandProfileMetrics: false,
   alwaysShowGermDmButton: false,
@@ -44,9 +46,18 @@ export type CrackSettingsButtonItem = {
   buttonLabel: string
 }
 
+export type CrackSettingsPickerItem = {
+  type: 'picker'
+  key: CrackSettingKey
+  label: string
+  description: string
+  options: {label: string; value: string}[]
+}
+
 export type CrackSettingsItem =
   | CrackSettingsToggleItem
   | CrackSettingsButtonItem
+  | CrackSettingsPickerItem
 
 export type CrackSettingsItemWithPredicate = CrackSettingsItem & {
   predicate?: () => boolean
@@ -185,7 +196,19 @@ export const crackSettingsSections: CrackSettingsSection[] = [
         type: 'toggle',
         key: 'consolidateAccountLabels',
         label: 'Consolidate account labels',
-        description: 'Collapse account label pills on posts after four.',
+        description: 'Collapse account label pills on posts.',
+      },
+      {
+        type: 'picker',
+        key: 'consolidationMethod',
+        label: 'Consolidation method',
+        description: '',
+        options: [
+          {label: 'First', value: 'total'},
+          {label: 'By Labeler', value: 'by_labeler'},
+        ],
+        predicate: () =>
+          persisted.get('crackSettings')?.consolidateAccountLabels || false,
       },
     ],
   },

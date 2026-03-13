@@ -133,6 +133,7 @@ const schema = z.object({
       hijackHideLabels: z.boolean().optional(),
       hideSuggestedAccounts: z.boolean().optional(),
       consolidateAccountLabels: z.boolean().optional(),
+      consolidationMethod: z.string().optional(),
       renamePostsToSkeets: z.boolean().optional(),
       expandProfileMetrics: z.boolean().optional(),
       alwaysShowGermDmButton: z.boolean().optional(),
